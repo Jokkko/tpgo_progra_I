@@ -25,12 +25,11 @@ def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax,terreno):
 def GenerarObjeto(mapa,objeto,cantidad,terreno):
     columnaSpawn = random.randint(0,len(mapa)-1) 
     filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
-
-    while(mapa[columnaSpawn][filaSpawn] != terreno and cantidad > 0): 
-        columnaSpawn = random.randint(0,len(mapa)-1) 
-        filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
-        cantidad -=1
-    mapa[columnaSpawn][filaSpawn] = objeto
+    for _ in range(cantidad):
+        while(mapa[columnaSpawn][filaSpawn] != terreno): 
+            columnaSpawn = random.randint(0,len(mapa)-1) 
+            filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
+        mapa[columnaSpawn][filaSpawn] = objeto
 
 def RenderizarMapa(mapa):
     for fila in mapa:
@@ -43,6 +42,7 @@ def LeerAccion():
         print("No existe tal accion. Intente denuevo.")
         accion = input("Elija una accion ('W','A','S','D' para el movimiento. 'I' para interactuar): ")
     return accion
+
 
 #def AccionPersonaje(accion):
 #    if(accion == "w"):
