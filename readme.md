@@ -4,7 +4,7 @@ El juego consiste en escapar de una sala generada de forma aleatoria, donde el j
 
 ## Integrantes
 * Claribel Pereyra
-* Lucas Vittale
+* Lucas Vitale
 * Joaquin Fernandes
 ***
 ## Fechas Importantes
