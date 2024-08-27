@@ -87,3 +87,7 @@ while(True): #PARA TESTEAR
     print(vaciarConsola)
     RenderizarMapa(mapa)
     AccionPersonaje(mapa,LeerAccion())
+
+def prueba():
+    print("hola")
+    
