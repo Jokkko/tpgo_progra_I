@@ -55,18 +55,18 @@ def LeerAccion():
 
 def GetIndiceObjeto(mapa,objeto):
     indices = []
-    for fila in range(len(mapa)):
-        for columna in range(len(mapa[fila])):
-            if(mapa[fila][columna] == objeto):
-                indices.append(fila)
-                indices.append(columna)
+    for y in range(len(mapa)):
+        for x in range(len(mapa[y])):
+            if(mapa[y][x] == objeto):
+                indices.append(y)
+                indices.append(x)
     return indices
 
-def AccionPersonaje(mapa,accion):
-    terreno = "/"
+def AccionPersonaje(mapa,accion): 
     personaje = "O"
     
-    if(accion == "w"):
+    if  (accion == "w"):
+
         MoverObjeto(mapa,0,1,personaje)
     elif(accion == "s"):
         MoverObjeto(mapa,0,-1,personaje) 
