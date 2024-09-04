@@ -48,7 +48,7 @@ Los entornos virtuales de Python son útiles para evitar conflictos entre difere
 * Desde una consola en la raíz del proyecto, ejecuta el siguiente comando:
   ```bash
   python -m venv .venv
- ```
+   ```
 
 * Después de completar, se debería crear una carpeta llamada `.venv` en la raíz del proyecto.
 * Para activar el entorno virtual, ejecuta:
@@ -72,4 +72,4 @@ Los entornos virtuales de Python son útiles para evitar conflictos entre difere
   allure-python-commons==2.8.13
   pytest==5.4.1
   selenium==3.141.0
- ```
+   ```
