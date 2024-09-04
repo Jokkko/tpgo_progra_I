@@ -16,18 +16,18 @@ El juego consiste en escapar de una sala generada de forma aleatoria, donde el j
 ## Temas a utilizar
 
    ### Para la primera entrega:
-      * Listas
-      * Matrices
-      * Funciones Lambda
-      * Regex
-      * Diccionarios
-      * Tuplas
-      * Excepciones
+      - Listas
+      - Matrices
+      - Funciones Lambda
+      - Regex
+      - Diccionarios
+      - Tuplas
+      - Excepciones
 
    ### Para la Segunda entrega:
-      * Unit test
-      * Archivos
-      * Recursividad
+      - Unit test
+      - Archivos
+      - Recursividad
 
 ## Posibles escenarios
    - **Temática 'La casa de papel'**: Basado en la serie reconocida de Netflix "La casa de papel"
