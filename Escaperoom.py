@@ -1,12 +1,14 @@
 import random
 
+terreno = " "
+
 def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     '''
     Genera un mapa de juego con una altura y un ancho, minimo y maximo
     Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
     '''
     mapa = []
-    terreno = "/"
+    #terreno = " "
     personaje = "O"
     candados = "$"
     pistas = "#"
@@ -73,50 +75,55 @@ def AccionPersonaje(mapa,accion):
         MoverObjeto(mapa,1,0,personaje)
 
 def MoverObjeto(mapa,x,y,objeto):
-    terreno = "/"
+    #terreno = " "
     coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
     mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
     mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
 
 def MenuPrincipal():
     #muestre las opciones del menu
-    return
+    #se puede usar center aca
+    pass
+
+def PedirUserName():
+    #Pide al usuario un nombre, (usar regex aca)
+    pass
 
 def PedirOpcion(min,max):
     #pida una opcion(numero) al usuario y la devuelva
-    return
+    pass
 
 def MostrarDificultades():
     #muestre las dificultades disponibles
-    return
+    pass
 
 def SeleccionarDificultad():
     #Permite al usuario seleccionar una dificultad de las disponibles
     MostrarDificultades()
     PedirOpcion()
-    return
+    pass
 
 def MostrarIntroduccionAlNivel():
     #Muestra el texto introductorio al nivel
-    return
+    pass
 
 def MostrarPistas():
     #TO DEFINE: muestra las pistas del nivel?
-    return
+    pass
 
 def EntrarEnDesafio():
     #Entra en un desafio dentro del 
-    return
+    pass
 
 def MostrarTematicas():
     #Muestra las tematicas disponibles
-    return
+    pass
 
 def ElegirTematica(dificultad):
     #Permite al usuario seleccionar una tematica de las disponibles a partir de la dificultad
     MostrarTematicas(dificultad)
     PedirOpcion()
-    return
+    pass
 
 def ComenzarJuego(tematica):
     #Funcion que comienza el juego para la tematica dada
@@ -141,24 +148,24 @@ vaciarConsola = "\n" * 50
 def main():
 
     ##PARA TESTEAR MOVIMIENTO
-    #mapa = GenerarMapa(6,11,8,16)
-    #while(True): 
-    #    print(vaciarConsola)
-    #    RenderizarMapa(mapa)
-    #    AccionPersonaje(mapa,LeerAccion())
-    jugando = True
-    dificultad = 0
-    tematica = 0
-    while(jugando):
-        MenuPrincipal()
-        opcion = PedirOpcion()
-        if(opcion == 1):
-            dificultad = SeleccionarDificultad()
-            tematica = ElegirTematica(dificultad)
-            ComenzarJuego(tematica)
-        elif (opcion == 0):
-            print("Saliendo...")
-            jugando = False
+    mapa = GenerarMapa(6,11,8,16)
+    while(True): 
+        print(vaciarConsola)
+        RenderizarMapa(mapa)
+        AccionPersonaje(mapa,LeerAccion())
+    #jugando = True
+    #dificultad = 0
+    #tematica = 0
+    #while(jugando):
+    #    MenuPrincipal()
+    #    opcion = PedirOpcion()
+    #    if(opcion == 1):
+    #        dificultad = SeleccionarDificultad()
+    #        tematica = ElegirTematica(dificultad)
+    #        ComenzarJuego(tematica)
+    #    elif (opcion == 0):
+    #        print("Saliendo...")
+    #        jugando = False
     
 
 
