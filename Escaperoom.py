@@ -11,7 +11,7 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     terreno = "/"
     personaje = "O"
     candados = "$"
-    pistas = "#"
+    pistas = "#"        
     GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax,terreno)
     GenerarObjeto(mapa,personaje,1,terreno)
     GenerarObjeto(mapa,candados,2,terreno)
