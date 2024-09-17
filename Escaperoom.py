@@ -1,6 +1,7 @@
 import random
+import re
 
-vaciarConsola = "\n" * 50
+terreno = " "
 
 def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     '''
@@ -8,7 +9,7 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
     '''
     mapa = []
-    terreno = "/"
+    #terreno = " "
     personaje = "O"
     candados = "$"
     pistas = "#"
@@ -46,27 +47,26 @@ def RenderizarMapa(mapa):
         print(fila)
 
 def LeerAccion():
-    accion = input("Elija una accion ('W','A','S','D' para el movimiento. 'I' para interactuar): ")
+    accion = input("Elija una accion ('W','A','S','D' para el movimiento.): ")
     while(accion.lower() != 'w' and accion.lower() != 's' and accion.lower() != 'a' and
-          accion.lower() != 'd' and accion.lower() != 'i'):
+          accion.lower() != 'd'):
         print("No existe tal accion. Intente denuevo.")
-        accion = input("Elija una accion ('W','A','S','D' para el movimiento. 'I' para interactuar): ")
+        accion = input("Elija una accion ('W','A','S','D' para el movimiento.")
     return accion
 
 def GetIndiceObjeto(mapa,objeto):
     indices = []
-    for fila in range(len(mapa)):
-        for columna in range(len(mapa[fila])):
-            if(mapa[fila][columna] == objeto):
-                indices.append(fila)
-                indices.append(columna)
+    for y in range(len(mapa)):
+        for x in range(len(mapa[y])):
+            if(mapa[y][x] == objeto):
+                indices.append(y)
+                indices.append(x)
     return indices
 
-def AccionPersonaje(mapa,accion):
-    terreno = "/"
+def AccionPersonaje(mapa,accion): 
     personaje = "O"
     
-    if(accion == "w"):
+    if  (accion == "w"):
         MoverObjeto(mapa,0,1,personaje)
     elif(accion == "s"):
         MoverObjeto(mapa,0,-1,personaje) 
@@ -76,18 +76,106 @@ def AccionPersonaje(mapa,accion):
         MoverObjeto(mapa,1,0,personaje)
 
 def MoverObjeto(mapa,x,y,objeto):
-    terreno = "/"
+    #terreno = " "
     coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
     mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
     mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
 
+def MenuPrincipal():
+    #muestre las opciones del menu
+    #se puede usar center aca
+    pass
 
-mapa = GenerarMapa(6,11,8,16)
-while(True): #PARA TESTEAR
-    print(vaciarConsola)
-    RenderizarMapa(mapa)
-    AccionPersonaje(mapa,LeerAccion())
+def PedirUserName():
+    #Pide al usuario un nombre, (usar regex aca)
+    username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+    patron = r"^[a-zA-Z]{3,9}$"
+    nombreValido = re.match(patron,username)
+    while(nombreValido == None):
+        print("Nombre no valido. Intentelo denuevo")    
+        username = input("Porfavor Ingrese su nombre de usuario, \nno puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+        nombreValido = re.match(patron,username)
+    return username
 
-def prueba():
-    print("hola")
+def PedirOpcion(min,max):
+    #pida una opcion(numero) al usuario y la devuelva
+    pass
+
+def MostrarDificultades():
+    #muestre las dificultades disponibles
+    pass
+
+def SeleccionarDificultad():
+    #Permite al usuario seleccionar una dificultad de las disponibles
+    MostrarDificultades()
+    PedirOpcion()
+    pass
+
+def MostrarIntroduccionAlNivel():
+    #Muestra el texto introductorio al nivel
+    pass
+
+def MostrarPistas():
+    #TO DEFINE: muestra las pistas del nivel?
+    pass
+
+def EntrarEnDesafio():
+    #Entra en un desafio dentro del 
+    pass
+
+def MostrarTematicas():
+    #Muestra las tematicas disponibles
+    pass
+
+def ElegirTematica(dificultad):
+    #Permite al usuario seleccionar una tematica de las disponibles a partir de la dificultad
+    MostrarTematicas(dificultad)
+    PedirOpcion()
+    pass
+
+def ComenzarJuego(tematica):
+    #Funcion que comienza el juego para la tematica dada
+    Escapo = False
+    mapa = []
+    MostrarIntroduccionAlNivel(tematica)
+    if(tematica == 1):
+        mapa = GenerarMapa(4,5,4,6) 
+        while(not Escapo):
+            AccionPersonaje(mapa,LeerAccion())
+            pass
+    elif(tematica == 2):
+        mapa = GenerarMapa(4,5,4,6) 
+        while(not Escapo):
+            AccionPersonaje(mapa,LeerAccion())
+            pass
+    #segun cada tematica
+
+
+vaciarConsola = "\n" * 50
+
+def main():
+
+    ##PARA TESTEAR MOVIMIENTO
+    mapa = GenerarMapa(6,11,8,16)
+    PedirUserName()
+    while(True): 
+        print(vaciarConsola)
+        RenderizarMapa(mapa)
+        AccionPersonaje(mapa,LeerAccion())
+    #jugando = True
+    #dificultad = 0
+    #tematica = 0
+    #while(jugando):
+    #    MenuPrincipal()
+    #    opcion = PedirOpcion()
+    #    if(opcion == 1):
+    #        dificultad = SeleccionarDificultad()
+    #        tematica = ElegirTematica(dificultad)
+    #        ComenzarJuego(tematica)
+    #    elif (opcion == 0):
+    #        print("Saliendo...")
+    #        jugando = False
     
+
+
+main()
