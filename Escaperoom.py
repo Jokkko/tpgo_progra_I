@@ -1,4 +1,5 @@
 import random
+import re
 
 terreno = " "
 
@@ -87,7 +88,14 @@ def MenuPrincipal():
 
 def PedirUserName():
     #Pide al usuario un nombre, (usar regex aca)
-    pass
+    username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+    patron = r"^[a-zA-Z]{3,9}$"
+    nombreValido = re.match(patron,username)
+    while(nombreValido == None):
+        print("Nombre no valido. Intentelo denuevo")    
+        username = input("Porfavor Ingrese su nombre de usuario, \nno puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+        nombreValido = re.match(patron,username)
+    return username
 
 def PedirOpcion(min,max):
     #pida una opcion(numero) al usuario y la devuelva
@@ -149,6 +157,7 @@ def main():
 
     ##PARA TESTEAR MOVIMIENTO
     mapa = GenerarMapa(6,11,8,16)
+    PedirUserName()
     while(True): 
         print(vaciarConsola)
         RenderizarMapa(mapa)
