@@ -112,7 +112,7 @@ def GenerarId():
     id = 0
     if(len(userRepository) != 0):
         ultimo = len(userRepository)-1 
-        userRepository[ultimo]['Id'] + 1
+        id = userRepository[ultimo]['Id'] + 1
     return id
 
 def PedirOpcion(min,max):
@@ -194,9 +194,4 @@ def main():
             print("Saliendo...")
             jugando = False
     
-
-mapa = GenerarMapa(6,11,8,16)
-while(True): 
-    print(vaciarConsola)
-    RenderizarMapa(mapa)
-    AccionPersonaje(mapa,LeerAccion())
+main()
