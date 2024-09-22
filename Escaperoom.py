@@ -15,7 +15,7 @@ def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     for _ in range(altoDelMapa):
         fila = []
         for _ in range(anchoMinimoDelMapa):
-            fila.append(terreno) 
+            fila.append(terreno)
         mapa.append(fila)
 
 def GenerarObjeto(mapa,objeto,cantidad):
@@ -46,8 +46,6 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
             GenerarObjeto(mapa,i,2) 
         
     return mapa
-
-
 
 def RenderizarMapa(mapa):
     for fila in mapa:
@@ -94,14 +92,16 @@ def MenuPrincipal():
     pass
 
 def PedirUserName():
-    #Pide al usuario un nombre, (usar regex aca)
-    username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+    username = input("Por favor, ingrese su nombre de usuario. \nNo puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales:")
     patron = r"^[a-zA-Z]{3,9}$"
-    nombreValido = re.match(patron,username)
-    while(nombreValido == None):
-        print("Nombre no valido. Intentelo denuevo")    
-        username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
-        nombreValido = re.match(patron,username)
+    nombreValido = re.match(patron, username)
+    while nombreValido is None or any(user['Username'] == username for user in userRepository):
+        if nombreValido is None:
+            print("Nombre no válido. Inténtelo de nuevo.")
+        else:
+            print("El nombre de usuario ya está en uso. Intente con otro.")
+        username = input("Por favor, ingrese su nombre de usuario, \nno puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales:")
+        nombreValido = re.match(patron, username)
     GenerarUser(username)
     return username
 
