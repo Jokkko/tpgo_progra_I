@@ -103,9 +103,13 @@ def PedirOpcion(min,max):
 
 def MostrarDificultades():
     #muestre las dificultades disponibles
-    pass
+    print("Niveles de dificultad: ")
+    print("1. Facil")
+    print("2. Normal")
+    print("3. Dificil")
+    
 
-def SeleccionarDificultad():
+def nivelDeDificultad():
     #Permite al usuario seleccionar una dificultad de las disponibles
     MostrarDificultades()
     PedirOpcion()
