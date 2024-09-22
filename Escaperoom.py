@@ -163,9 +163,45 @@ def nivelDeDificultad():
 
     
 
-def MostrarIntroduccionAlNivel():
-    #Muestra el texto introductorio al nivel
-    pass
+def ElegirTematica():
+    dificultad = nivelDeDificultad() 
+    print("Temáticas disponibles:")
+    for i, tematica in enumerate(dificultad, start=1):
+        print(f"{i}: {tematica}")
+
+    seleccion = PedirOpcion(1, len(dificultad)) 
+    MostrarIntroduccionALaTematica(dificultad[seleccion - 1]) 
+
+def MostrarIntroduccionALaTematica(tematica):   
+    introducciones = {
+    "Breaking Bad": "Te encontrás en el laboratorio de metanfetaminas de Walter White.\n"
+                    "Tu misión es encontrar la fórmula secreta antes de que la DEA llegue.\n"
+                    "Cada segundo cuenta, y las decisiones que tomes definen tu destino.\n"
+                    "¿Estás listo para arriesgarlo todo?",
+
+    "Muerte Anunciada": "La historia comienza con un asesinato, y el reloj corre en tu contra.\n"
+                        "Debes desentrañar la verdad detrás del crimen y descubrir al culpable antes de que se consuma la fatalidad.\n"
+                        "Recordá, cada pista que encuentres te acercará a la verdad… o te alejará de ella.",
+
+    "Psiquiátrico": "Te despertás en un oscuro y olvidado psiquiátrico.\n"
+                    "Tu objetivo es escapar de las garras de una mente retorcida.\n"
+                    "Explorá las habitaciones llenas de secretos, resuelve enigmas y desvela la historia perturbadora de este lugar.\n"
+                    "Solo los más astutos lograrán salir con cordura.",
+
+    "La Casa de Papel": "Sos parte de un equipo de criminales audaces que ha tomado una institución bancaria como rehén.\n"
+                       "Tu misión es ejecutar el plan maestro del Profesor: robar millones y salir sin ser atrapados.\n"
+                       "Cada decisión cuenta, y el tiempo corre. ¡Prepárate para la adrenalina!",
+
+    "Sherlock Holmes": "En esta sala, un crimen intrigante tuvo lugar y solo vos podés resolverlo.\n"
+                        "Con la astucia y la deducción como tus armas, examiná las pistas, interrogá a los sospechosos y desentrañá el misterio que desafía incluso a la mente más brillante.\n"
+                      "La verdad está a tu alcance… si sos lo suficientemente perspicaz.",
+
+    "Misión Gubernamental": "Te encontrás en el corazón de una operación encubierta.\n"
+                            "Una amenaza inminente pone en riesgo la seguridad nacional.\n"
+                            "Como agente especial, debes reunir pruebas, desactivar dispositivos y prevenir un desastre antes de que sea demasiado tarde.\n"
+                            "La presión es alta, y cada segundo puede significar la diferencia entre el éxito y el fracaso."
+}
+    print(introducciones.get(tematica, "Introducción no disponible."))
 
 def MostrarPistas():
     #TO DEFINE: muestra las pistas del nivel?
@@ -175,21 +211,11 @@ def EntrarEnDesafio():
     #Entra en un desafio dentro del 
     pass
 
-def MostrarTematicas():
-    #Muestra las tematicas disponibles
-    pass
-
-def ElegirTematica(dificultad):
-    #Permite al usuario seleccionar una tematica de las disponibles a partir de la dificultad
-    MostrarTematicas(dificultad)
-    PedirOpcion()
-    pass
-
 def ComenzarJuego(tematica):
     #Funcion que comienza el juego para la tematica dada
     Escapo = False
     mapa = []
-    MostrarIntroduccionAlNivel(tematica)
+    MostrarIntroduccionALaTematica(tematica)
     if(tematica == 1):
         mapa = GenerarMapa(4,5,4,6) 
         while(not Escapo):
