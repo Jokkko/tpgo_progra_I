@@ -105,11 +105,25 @@ def MostrarDificultades():
     #muestre las dificultades disponibles
     pass
 
-def SeleccionarDificultad():
+def nivelDeDificultad():
     #Permite al usuario seleccionar una dificultad de las disponibles
     MostrarDificultades()
-    PedirOpcion()
-    pass
+    opcion = PedirOpcion(1,3)
+
+    facil = ["Breaking bad","Muerte anunciada"]
+    intermedio = ["Psiquiatrico","La casa de papel"]
+    dificil = ["Sherlock Holmes","Mision gubernamental"]
+
+    if opcion == 1:
+        dificultad = facil
+    elif opcion == 2:
+        dificultad = intermedio
+    elif opcion == 3:
+        dificultad = dificil
+
+    return dificultad
+
+    
 
 def MostrarIntroduccionAlNivel():
     #Muestra el texto introductorio al nivel
