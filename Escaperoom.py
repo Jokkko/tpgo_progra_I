@@ -91,19 +91,29 @@ def MenuPrincipal():
     #se puede usar center aca
     pass
 
-def PedirUserName():
-    username = input("Por favor, ingrese su nombre de usuario. \nNo puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales:")
+def PedirUserName(jugador_numero):
+    # Función auxiliar para pedir un nombre de usuario válido
     patron = r"^[a-zA-Z]{3,9}$"
+    
+    username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario.\nNo puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales: ")
     nombreValido = re.match(patron, username)
+    
     while nombreValido is None or any(user['Username'] == username for user in userRepository):
         if nombreValido is None:
-            print("Nombre no válido. Inténtelo de nuevo.")
+            print(f"Nombre no válido para el Jugador {jugador_numero}. Inténtelo de nuevo.")
         else:
-            print("El nombre de usuario ya está en uso. Intente con otro.")
-        username = input("Por favor, ingrese su nombre de usuario, \nno puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales:")
+            print(f"El nombre de usuario ya está en uso. Intente con otro.")
+        username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario:\n")
         nombreValido = re.match(patron, username)
+    
     GenerarUser(username)
     return username
+
+def PedirUserNames():
+    # Llama a la función auxiliar para ambos jugadores
+    username1 = PedirUserName(1)
+    username2 = PedirUserName(2)
+    return username1, username2
 
 def GenerarUser(username):
     userRepository.append(dict(Username=username,Id = GenerarId() ))
