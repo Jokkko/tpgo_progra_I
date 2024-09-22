@@ -203,9 +203,61 @@ def MostrarIntroduccionALaTematica(tematica):
 }
     print(introducciones.get(tematica, "Introducción no disponible."))
 
-def MostrarPistas():
-    #TO DEFINE: muestra las pistas del nivel?
-    pass
+def inicializar_pistas():
+    # Diccionario de pistas
+    pistas = {
+        "Breaking Bad": [
+            "Busca en el laboratorio un objeto que brilla en la oscuridad.",
+            "El equipo de protección personal es clave para el éxito. Revisa las cajas.",
+            "Las fórmulas están escondidas en los documentos; no olvides mirar en las carpetas.",
+            "La química puede ser peligrosa. Estudia los frascos con atención."
+        ],
+        "Muerte Anunciada": [
+            "Revisa la habitación donde se celebró la fiesta, hay más de lo que parece.",
+            "Algunos invitados saben más de lo que dicen. Escucha con atención.",
+            "Los periódicos antiguos pueden contener pistas sobre el asesinato.",
+            "Un objeto olvidado podría ser la clave para resolver el misterio."
+        ],
+        "Psiquiátrico": [
+            "Las habitaciones son un laberinto; sigue las marcas en la pared.",
+            "El diario del último paciente podría revelarte información crucial.",
+            "Revisa los cuadros; algunos pueden esconder secretos oscuros."
+        ],
+        "La Casa de Papel": [
+            "El plano del banco tiene detalles que podrían ser útiles. No lo ignores.",
+            "Cada miembro del equipo tiene una habilidad única; úsalas a tu favor.",
+            "Hay cámaras en todo el lugar; busca la manera de desactivarlas."
+        ],
+        "Sherlock Holmes": [
+            "La carta en la mesa contiene un mensaje cifrado; decodifícalo.",
+            "No todos los sospechosos son lo que parecen; investiga sus alibis."
+        ],
+        "Misión Gubernamental": [
+            "Un dispositivo escondido puede cambiar el curso de la misión; búscalo.",
+            "Las comunicaciones pueden estar interceptadas. Encuentra el canal seguro."
+        ]
+    }
+
+    pistas_usadas = {key: [] for key in pistas.keys()}
+    
+    return pistas, pistas_usadas
+
+def MostrarPista(tematica, pistas, pistas_usadas):
+    if tematica in pistas:
+        # filtra por las pistas no utilizadas
+        disponibles = [pista for pista in pistas[tematica] if pista not in pistas_usadas[tematica]]
+        
+        if disponibles:
+            #elije una pista entre disponibles de forma aleatorias
+            pista = random.choice(disponibles)
+            print(f"Pista para {tematica}: {pista}")
+            # marca la pista como usada y la suma a la lista de pistas usadas
+            pistas_usadas[tematica].append(pista)
+        else:
+            print(f"No hay más pistas disponibles para la temática '{tematica}'.")
+    else:
+        print(f"Temática '{tematica}' no válida.")
+
 
 def EntrarEnDesafio():
     #Entra en un desafio dentro del 
