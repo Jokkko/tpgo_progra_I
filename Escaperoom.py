@@ -2,6 +2,7 @@ import random
 import re
 
 terreno = " "
+users = [] #lista de usuarios. por ahora se guardan acá la idea es en un futuro usar archivos
 
 def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     '''
@@ -87,14 +88,22 @@ def MenuPrincipal():
     pass
 
 def PedirUserName():
-    #Pide al usuario un nombre, (usar regex aca)
-    username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
-    patron = r"^[a-zA-Z]{3,9}$"
-    nombreValido = re.match(patron,username)
-    while(nombreValido == None):
-        print("Nombre no valido. Intentelo denuevo")    
-        username = input("Porfavor Ingrese su nombre de usuario, \nno puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
-        nombreValido = re.match(patron,username)
+    global users
+    username = input("Por favor ingrese su nombre de usuario. \nNo puede contener más de 10 caracteres ni menos de 3, ni números, ni caracteres especiales:")
+    
+    patron = r"^[a-zA-Z]{3,10}$"
+    nombreValido = re.match(patron, username)
+    
+    while nombreValido is None or username in users:
+        if nombreValido is None:
+            print("Nombre no válido. Inténtelo de nuevo.")
+        elif username in users:
+            print("El nombre de usuario ya existe. Intente con otro.")
+        
+        username = input("Por favor ingrese su nombre de usuario. \nNo puede contener más de 10 caracteres ni menos de 3, ni números, ni caracteres especiales:")
+        nombreValido = re.match(patron, username)
+    
+    users.append(username)
     return username
 
 def PedirOpcion(min,max):
