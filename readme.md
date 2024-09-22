@@ -12,10 +12,10 @@ EscapeRoom
  ## 🔛 Getting Started
  ### Prerequisitos
 
-    > #### Python 
-    - Descargar [Python](https://www.python.org/downloads/).
-    - Instalá Python y con figurá las variables de entorno.
-    - Podés verificar que lo hayas hecho correctamente corriendo *python --version* desde cualqueir consola o termina en tu computadora
-    +
+> Python 
 
-    jajjajajajaj 
+```
+- Descargar [Python](https://www.python.org/downloads/).
+- Instalá Python y con figurá las variables de entorno.
+- Podés verificar que lo hayas hecho correctamente corriendo *python --version* desde cualqueir consola o termina en tu computadora
+```
