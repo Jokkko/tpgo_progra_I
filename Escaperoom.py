@@ -2,6 +2,30 @@ import random
 import re
 
 terreno = " "
+userRepository = []
+
+def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
+    '''
+    Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por parametro
+    el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
+    '''
+    altoDelMapa = random.randint(alturaMin,alturaMax)
+    anchoMinimoDelMapa = random.randint(anchoMin,anchoMax) 
+
+    for _ in range(altoDelMapa):
+        fila = []
+        for _ in range(anchoMinimoDelMapa):
+            fila.append(terreno)
+        mapa.append(fila)
+
+def GenerarObjeto(mapa,objeto,cantidad):
+    columnaSpawn = random.randint(0,len(mapa)-1) 
+    filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
+    for _ in range(cantidad):
+        while(mapa[columnaSpawn][filaSpawn] != terreno): 
+            columnaSpawn = random.randint(0,len(mapa)-1) 
+            filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
+        mapa[columnaSpawn][filaSpawn] = objeto
 
 def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     '''
@@ -13,34 +37,15 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     personaje = "O"
     candados = "$"
     pistas = "#"
-    GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax,terreno)
-    GenerarObjeto(mapa,personaje,1,terreno)
-    GenerarObjeto(mapa,candados,2,terreno)
-    GenerarObjeto(mapa,pistas,2,terreno)
+    objetos = [personaje,candados,pistas]
+    GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax)
+    for i in objetos:
+        if(i == personaje):
+            GenerarObjeto(mapa,i,1)
+        else:
+            GenerarObjeto(mapa,i,2) 
+        
     return mapa
-
-def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax,terreno):
-    '''
-    Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por parametro
-    el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
-    '''
-    altoDelMapa = random.randint(alturaMin,alturaMax)
-    anchoMinimoDelMapa = random.randint(anchoMin,anchoMax) 
-
-    for _ in range(altoDelMapa):
-        fila = []
-        for _ in range(anchoMinimoDelMapa):
-            fila.append(terreno) 
-        mapa.append(fila)
-
-def GenerarObjeto(mapa,objeto,cantidad,terreno):
-    columnaSpawn = random.randint(0,len(mapa)-1) 
-    filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
-    for _ in range(cantidad):
-        while(mapa[columnaSpawn][filaSpawn] != terreno): 
-            columnaSpawn = random.randint(0,len(mapa)-1) 
-            filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
-        mapa[columnaSpawn][filaSpawn] = objeto
 
 def RenderizarMapa(mapa):
     for fila in mapa:
@@ -86,16 +91,39 @@ def MenuPrincipal():
     #se puede usar center aca
     pass
 
-def PedirUserName():
-    #Pide al usuario un nombre, (usar regex aca)
-    username = input("Porfavor Ingrese su nombre de usuario, \nNo puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
+def PedirUserName(jugador_numero):
+    # Función auxiliar para pedir un nombre de usuario válido
     patron = r"^[a-zA-Z]{3,9}$"
-    nombreValido = re.match(patron,username)
-    while(nombreValido == None):
-        print("Nombre no valido. Intentelo denuevo")    
-        username = input("Porfavor Ingrese su nombre de usuario, \nno puede contener mas de 10 caracteres ni menos de 3, numeros, ni caracteres especiales:")
-        nombreValido = re.match(patron,username)
+    
+    username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario.\nNo puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales: ")
+    nombreValido = re.match(patron, username)
+    
+    while nombreValido is None or any(user['Username'] == username for user in userRepository):
+        if nombreValido is None:
+            print(f"Nombre no válido para el Jugador {jugador_numero}. Inténtelo de nuevo.")
+        else:
+            print(f"El nombre de usuario ya está en uso. Intente con otro.")
+        username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario:\n")
+        nombreValido = re.match(patron, username)
+    
+    GenerarUser(username)
     return username
+
+def PedirUserNames():
+    # Llama a la función auxiliar para ambos jugadores
+    username1 = PedirUserName(1)
+    username2 = PedirUserName(2)
+    return username1, username2
+
+def GenerarUser(username):
+    userRepository.append(dict(Username=username,Id = GenerarId() ))
+
+def GenerarId():
+    id = 0
+    if(len(userRepository) != 0):
+        ultimo = len(userRepository)-1 
+        id = userRepository[ultimo]['Id'] + 1
+    return id
 
 def PedirOpcion(min,max):
     #pida una opcion(numero) al usuario y la devuelva
@@ -158,24 +186,22 @@ def main():
     ##PARA TESTEAR MOVIMIENTO
     mapa = GenerarMapa(6,11,8,16)
     PedirUserName()
-    while(True): 
-        print(vaciarConsola)
-        RenderizarMapa(mapa)
-        AccionPersonaje(mapa,LeerAccion())
-    #jugando = True
-    #dificultad = 0
-    #tematica = 0
-    #while(jugando):
-    #    MenuPrincipal()
-    #    opcion = PedirOpcion()
-    #    if(opcion == 1):
-    #        dificultad = SeleccionarDificultad()
-    #        tematica = ElegirTematica(dificultad)
-    #        ComenzarJuego(tematica)
-    #    elif (opcion == 0):
-    #        print("Saliendo...")
-    #        jugando = False
+    #while(True): 
+    #    print(vaciarConsola)
+    #    RenderizarMapa(mapa)
+    #    AccionPersonaje(mapa,LeerAccion())
+    jugando = True
+    dificultad = 0
+    tematica = 0
+    while(jugando):
+        MenuPrincipal()
+        opcion = PedirOpcion()
+        if(opcion == 1):
+            dificultad = SeleccionarDificultad()
+            tematica = ElegirTematica(dificultad)
+            ComenzarJuego(tematica)
+        elif (opcion == 0):
+            print("Saliendo...")
+            jugando = False
     
-
-
 main()
