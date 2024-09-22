@@ -1,4 +1,4 @@
-import random
+ import random
 import re
 
 terreno = " "
@@ -263,8 +263,18 @@ def EntrarEnDesafio():
     #Entra en un desafio dentro del 
     pass
 
+def modificar_puntos(puntos, accion):
+    if accion == "usar_pista":
+        return puntos - 100
+    elif accion == "completar_desafio":
+        return puntos + 50
+    elif accion == "accion_correcta":
+        return puntos + 10
+    return puntos
+
 def ComenzarJuego(tematica):
     #Funcion que comienza el juego para la tematica dada
+    puntos = 1000
     Escapo = False
     mapa = []
     MostrarIntroduccionALaTematica(tematica)
@@ -278,7 +288,14 @@ def ComenzarJuego(tematica):
         while(not Escapo):
             AccionPersonaje(mapa,LeerAccion())
             pass
-    #segun cada tematica
+    
+    #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
+    if accion == "usar_pista": 
+        puntos = modificar_puntos(puntos, "usar_pista")
+    elif accion == "completar_desafio": 
+        puntos = modificar_puntos(puntos, "completar_desafio")
+    elif accion == "accion_correcta":
+        puntos = modificar_puntos(puntos, "accion_correcta")
 
 
 vaciarConsola = "\n" * 50
