@@ -98,8 +98,14 @@ def PedirUserName():
     return username
 
 def PedirOpcion(min,max):
-    #pida una opcion(numero) al usuario y la devuelva
-    pass
+    #pide una opcion(numero) al usuario y la devuelva
+    opcion = int(input("Elija una opcion entre: ",min, "y", max))
+    
+    while opcion < min or opcion > max:
+        print("Error")
+        opcion = int(input("elija una opcion entre: ",min, "y", max))
+    
+    return opcion
 
 def MostrarDificultades():
     #muestre las dificultades disponibles
