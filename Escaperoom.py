@@ -282,32 +282,49 @@ def modificar_puntos(puntos, accion):
         return puntos + 10
     return puntos
 
+def MapaParaTematica(tematica):
+    mapa = []
+    if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
+        mapa = GenerarMapa(4,5,4,6) 
+    elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
+        mapa = GenerarMapa(7,8,5,7)
+    elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
+        mapa = GenerarMapa(9,10,5,8)
+    return mapa
+
+def ContieneElementos(lista1, lista2):
+    ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
+    #Se recorre en el largo de lista2 (Para poder recorrer toda la segunda lista), se le resta el largo de la primera lista (para poder mirar desde i + el largo de lista1 sin pasarnos del indice)
+    for i in range(len(lista2) - len(lista1) + 1):
+        if lista2[i:i+len(lista1)] == lista1: 
+        # Aca se extrae de la lista 2 en indice i, hasta i + el largo de lista1, si esa extraccion es igual a la lista1, entnces la lista 1 esta en la lista dos de forma secuencial
+            return True
+    return False
+
 def ComenzarJuego(tematica):
     #Funcion que comienza el juego para la tematica dada
     puntos = 1000
     Escapo = False
-    mapa = []
-    #facil = ["Breaking Bad","Muerte Anunciada"]
-    #intermedio = ["Psiquiátrico","La Casa de Papel"]
-    #dificil = ["Sherlock Holmes","Misión Gubernamental"]
-    if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
-        mapa = GenerarMapa(4,5,4,6) 
-        while(not Escapo):
-            RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
+    pistas, pistas_usadas = inicializar_pistas()
+    mapa = MapaParaTematica(tematica)
+    objetos = ["#","$"]
+    for i in objetos:
+        if(i=="#"):
+            indicesPistas = GetIndiceObjeto(mapa,i)
+            print(indicesPistas)
+        else:
+            indicesCandados = GetIndiceObjeto(mapa,i)
+            print(indicesCandados)
+    
+    while(not Escapo):
+        print(vaciarConsola)
+        print(pistas_usadas.get(tematica))
+        if(ContieneElementos(GetIndiceObjeto(mapa,"O"), indicesPistas)):
+            MostrarPista(tematica, pistas, pistas_usadas)
+        elif(ContieneElementos(GetIndiceObjeto(mapa,"O"), indicesPistas)):
             pass
-    elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
-        mapa = GenerarMapa(7,8,5,7)
-        while(not Escapo):
-            RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
-            pass
-    elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
-        mapa = GenerarMapa(9,10,5,8)
-        while(not Escapo):
-            RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
-            pass
+        RenderizarMapa(mapa)
+        AccionPersonaje(mapa,LeerAccion())
     
     #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
     #if accion == "usar_pista": 
