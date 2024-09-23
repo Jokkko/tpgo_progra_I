@@ -1,8 +1,9 @@
- import random
+import random
 import re
 
 terreno = " "
 userRepository = []
+vaciarConsola = "\n" * 50
 
 def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     '''
@@ -68,6 +69,12 @@ def GetIndiceObjeto(mapa,objeto):
                 indices.append(x)
     return indices
 
+def MoverObjeto(mapa,x,y,objeto):
+    #terreno = " "
+    coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
+    mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
+    mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
+
 def AccionPersonaje(mapa,accion): 
     personaje = "O"
     
@@ -80,18 +87,18 @@ def AccionPersonaje(mapa,accion):
     elif(accion == "d"):
         MoverObjeto(mapa,1,0,personaje)
 
-def MoverObjeto(mapa,x,y,objeto):
-    #terreno = " "
-    coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
-    mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
-    mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
 
 def MenuPrincipal():
     #muestre las opciones del menu
     #se puede usar center aca
-    pass
+    print("Bienvenido a ESCAPEROOM SIMULATOR")
+    print("1. Comenzar Juego")
+    print("2. Ranking de puntos")
+    print("3. Como Jugar")
+    print("4. Salir")
+    
 
-def PedirUserName(jugador_numero):
+def PedirUserName(jugador_numero = 1):
     # Función auxiliar para pedir un nombre de usuario válido
     patron = r"^[a-zA-Z]{3,9}$"
     
@@ -127,11 +134,11 @@ def GenerarId():
 
 def PedirOpcion(min,max):
     #pide una opcion(numero) al usuario y la devuelva
-    opcion = int(input("Elija una opcion entre: ",min, "y", max))
+    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     while opcion < min or opcion > max:
         print("Error")
-        opcion = int(input("elija una opcion entre: ",min, "y", max))
+        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     return opcion
 
@@ -148,9 +155,9 @@ def nivelDeDificultad():
     MostrarDificultades()
     opcion = PedirOpcion(1,3)
 
-    facil = ["Breaking bad","Muerte anunciada"]
-    intermedio = ["Psiquiatrico","La casa de papel"]
-    dificil = ["Sherlock Holmes","Mision gubernamental"]
+    facil = ["Breaking Bad","Muerte Anunciada"]
+    intermedio = ["Psiquiátrico","La Casa de Papel"]
+    dificil = ["Sherlock Holmes","Misión Gubernamental"]
 
     if opcion == 1:
         dificultad = facil
@@ -166,11 +173,14 @@ def nivelDeDificultad():
 def ElegirTematica():
     dificultad = nivelDeDificultad() 
     print("Temáticas disponibles:")
-    for i, tematica in enumerate(dificultad, start=1):
+    i = 1
+    for tematica in dificultad:
         print(f"{i}: {tematica}")
+        i+=i
 
     seleccion = PedirOpcion(1, len(dificultad)) 
     MostrarIntroduccionALaTematica(dificultad[seleccion - 1]) 
+    return dificultad[seleccion - 1]
 
 def MostrarIntroduccionALaTematica(tematica):   
     introducciones = {
@@ -277,50 +287,63 @@ def ComenzarJuego(tematica):
     puntos = 1000
     Escapo = False
     mapa = []
-    MostrarIntroduccionALaTematica(tematica)
-    if(tematica == 1):
+    #facil = ["Breaking Bad","Muerte Anunciada"]
+    #intermedio = ["Psiquiátrico","La Casa de Papel"]
+    #dificil = ["Sherlock Holmes","Misión Gubernamental"]
+    if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = GenerarMapa(4,5,4,6) 
         while(not Escapo):
+            RenderizarMapa(mapa)
             AccionPersonaje(mapa,LeerAccion())
             pass
-    elif(tematica == 2):
-        mapa = GenerarMapa(4,5,4,6) 
+    elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
+        mapa = GenerarMapa(7,8,5,7)
         while(not Escapo):
+            RenderizarMapa(mapa)
+            AccionPersonaje(mapa,LeerAccion())
+            pass
+    elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
+        mapa = GenerarMapa(9,10,5,8)
+        while(not Escapo):
+            RenderizarMapa(mapa)
             AccionPersonaje(mapa,LeerAccion())
             pass
     
     #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
-    if accion == "usar_pista": 
-        puntos = modificar_puntos(puntos, "usar_pista")
-    elif accion == "completar_desafio": 
-        puntos = modificar_puntos(puntos, "completar_desafio")
-    elif accion == "accion_correcta":
-        puntos = modificar_puntos(puntos, "accion_correcta")
+    #if accion == "usar_pista": 
+    #    puntos = modificar_puntos(puntos, "usar_pista")
+    #elif accion == "completar_desafio": 
+    #    puntos = modificar_puntos(puntos, "completar_desafio")
+    #elif accion == "accion_correcta":
+    #    puntos = modificar_puntos(puntos, "accion_correcta")
 
-
-vaciarConsola = "\n" * 50
+def Instrucciones():
+    print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
+    print("Buena Suerte, la vas a necesitar.")
 
 def main():
 
     ##PARA TESTEAR MOVIMIENTO
-    mapa = GenerarMapa(6,11,8,16)
-    PedirUserName()
+    #mapa = GenerarMapa(6,11,8,16)
     #while(True): 
     #    print(vaciarConsola)
     #    RenderizarMapa(mapa)
     #    AccionPersonaje(mapa,LeerAccion())
+    PedirUserName()
     jugando = True
-    dificultad = 0
     tematica = 0
     while(jugando):
         MenuPrincipal()
-        opcion = PedirOpcion()
+        opcion = PedirOpcion(1,4)
         if(opcion == 1):
-            dificultad = SeleccionarDificultad()
-            tematica = ElegirTematica(dificultad)
+            tematica = ElegirTematica()
             ComenzarJuego(tematica)
-        elif (opcion == 0):
-            print("Saliendo...")
+        elif (opcion == 2):
+           pass
+        elif (opcion == 3):
+            Instrucciones()
+        elif (opcion == 4):
+            print("Gracias por Jugar! Saliendo...")
             jugando = False
     
 main()
