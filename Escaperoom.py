@@ -111,7 +111,7 @@ def MenuPrincipal():
     #muestre las opciones del menu
     #se puede usar center aca
     print()
-    print("Bienvenido a ESCAPEROOM SIMULATOR")
+    print("Bienvenido a UadEscape")
     print("1. Comenzar Juego")
     print("2. Ranking de puntos")
     print("3. Como Jugar")
@@ -414,16 +414,6 @@ def ComenzarJuego(tematica):
             print("Movimiento inválido: fuera de los límites del mapa.")
     
     return puntos
-
-        
-    
-    #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
-    #if accion == "usar_pista": 
-    #    puntos = modificar_puntos(puntos, "usar_pista")
-    #elif accion == "completar_desafio": 
-    #    puntos = modificar_puntos(puntos, "completar_desafio")
-    #elif accion == "accion_correcta":
-    #    puntos = modificar_puntos(puntos, "accion_correcta")
 
 def Instrucciones():
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
