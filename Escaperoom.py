@@ -148,15 +148,18 @@ def GenerarId():
         id = userRepository[ultimo]['Id'] + 1
     return id
 
-def PedirOpcion(min,max):
-    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    while opcion < min or opcion > max:
-        print("Error")
-        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    print()
-    return opcion
+def PedirOpcion(min, max):
+    ''' Solicita al usuario que elija una opción dentro de un rango específico. 
+    Esta función se reutiliza en todas las funciones del programa donde se tenga que pedir opciones al user'''
+    while True:
+        try:
+            opcion = int(input(f"Elija una opción entre {min} y {max}: "))
+            if min <= opcion <= max:
+                return opcion
+            else:
+                print("Error: opción fuera de rango.")
+        except ValueError:
+            print("Error: ingrese un número válido.")
 
 def MostrarDificultades():
     print("Niveles de dificultad: ")
