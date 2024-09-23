@@ -328,7 +328,7 @@ def ComenzarJuego(tematica):
     
     while not Escapo:
         posicion_actual = GetIndiceObjeto(mapa,"O")
-        print(pistas_usadas.get(tematica))
+        print(pistas_usadas.get(tematica,"Cuando encuentres una pista aparecera aca"))
         if(ContieneElementos(posicion_actual, indicesPistas)): 
             MostrarPista(tematica, pistas, pistas_usadas)
         elif(ContieneElementos(posicion_actual, indicesCandados)):
@@ -341,7 +341,8 @@ def ComenzarJuego(tematica):
             Escapo = True
             puntos = 0
             
-        elif ValidarMovimiento(mapa, posicion_actual, accion):        
+        elif ValidarMovimiento(mapa, posicion_actual, accion):
+            ModificarPuntos(puntos,accion)        
             AccionPersonaje(mapa,accion)
             puntos = ModificarPuntos(puntos, accion)
             print(f"Puntos actuales: {puntos}")
