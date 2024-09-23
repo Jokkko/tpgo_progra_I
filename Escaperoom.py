@@ -53,8 +53,8 @@ def RenderizarMapa(mapa):
         print(fila)
 
 def LeerAccion():
-    accionesValidas = {'w', 'a', 's', 'd','menu'}
-    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
+    accionesValidas = {'w', 'a', 's', 'd'}
+    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
     while accion not in accionesValidas:
         print("Acción no válida. Intentálo de nuevo.")
         accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
@@ -293,6 +293,8 @@ def ModificarPuntos(puntos, accion):
         return puntos + 50
     elif accion == "accion_correcta":
         return puntos + 10
+    else:
+        return puntos - 10
     return puntos
 
 def MapaParaTematica(tematica):
@@ -335,22 +337,11 @@ def ComenzarJuego(tematica):
             pass
         RenderizarMapa(mapa)
         accion = LeerAccion()
-
-        if accion == "menu":
-            print("Saliendo al menu principal...")
-            Escapo = True
-            puntos = 0
             
-        elif ValidarMovimiento(mapa, posicion_actual, accion):        
+        if ValidarMovimiento(mapa, posicion_actual, accion):        
             AccionPersonaje(mapa,accion)
-            puntos = ModificarPuntos(puntos, accion)
-            print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
-    
-    return puntos
-
-        
     
     #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
     #if accion == "usar_pista": 
@@ -383,7 +374,11 @@ def main():
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
             tematica = ElegirTematica()
-            ComenzarJuego(tematica)
+            puntos = ComenzarJuego(tematica)
+            if puntos > 0:
+                print("Felicidades, escapaste")
+            else:
+                print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
            pass
         elif (opcion == 3):
