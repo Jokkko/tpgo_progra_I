@@ -383,7 +383,11 @@ def main():
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
             tematica = ElegirTematica()
-            ComenzarJuego(tematica)
+            puntos = ComenzarJuego(tematica)
+            if puntos > 0:
+                print("Felicidades, escapaste")
+            else:
+                print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
            pass
         elif (opcion == 3):
