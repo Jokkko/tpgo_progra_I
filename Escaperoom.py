@@ -53,11 +53,11 @@ def RenderizarMapa(mapa):
         print(fila)
 
 def LeerAccion():
-    accionesValidas = {'w', 'a', 's', 'd'}
-    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
+    accionesValidas = {'w', 'a', 's', 'd','menu'}
+    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     while accion not in accionesValidas:
         print("Acción no válida. Intentálo de nuevo.")
-        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
+        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     return accion
 
 def ValidarMovimiento(mapa, posicion_actual, accion):
@@ -337,11 +337,18 @@ def ComenzarJuego(tematica):
             pass
         RenderizarMapa(mapa)
         accion = LeerAccion()
+        if accion == 'menu':
+            print("Saliendo al menu principal...")
+            Escapo = True
+            puntos = 0
             
         if ValidarMovimiento(mapa, posicion_actual, accion):        
             AccionPersonaje(mapa,accion)
+            puntos = ModificarPuntos(puntos,accion)
+            print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
+    return puntos
     
     #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
     #if accion == "usar_pista": 
