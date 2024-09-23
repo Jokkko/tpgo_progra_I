@@ -53,8 +53,8 @@ def RenderizarMapa(mapa):
         print(fila)
 
 def LeerAccion():
-    accionesValidas = {'w', 'a', 's', 'd'}
-    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
+    accionesValidas = {'w', 'a', 's', 'd','menu'}
+    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     while accion not in accionesValidas:
         print("Acción no válida. Intentálo de nuevo.")
         accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
