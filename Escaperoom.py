@@ -335,13 +335,21 @@ def ComenzarJuego(tematica):
             pass
         RenderizarMapa(mapa)
         accion = LeerAccion()
+
+        if accion == "menu":
+            print("Saliendo al menu principal...")
+            Escapo = True, puntos = 0
             
-        if ValidarMovimiento(mapa, posicion_actual, accion):        
+        elif ValidarMovimiento(mapa, posicion_actual, accion):        
             AccionPersonaje(mapa,accion)
             puntos = ModificarPuntos(puntos, accion)
             print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
+    
+    return puntos
+
+        
     
     #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
     #if accion == "usar_pista": 
