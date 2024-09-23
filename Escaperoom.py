@@ -338,6 +338,8 @@ def ComenzarJuego(tematica):
             
         if ValidarMovimiento(mapa, posicion_actual, accion):        
             AccionPersonaje(mapa,accion)
+            puntos = ModificarPuntos(puntos, accion)
+            print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
     
