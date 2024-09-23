@@ -5,7 +5,7 @@ terreno = " "
 userRepository = []
 vaciarConsola = "\n" * 50
 
-def GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
+def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     '''
     Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por parametro
     el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
@@ -39,7 +39,7 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     candados = "$"
     pistas = "#"
     objetos = [personaje,candados,pistas]
-    GenerarTereno(mapa,alturaMin,alturaMax,anchoMin,anchoMax)
+    GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax)
     for i in objetos:
         if(i == personaje):
             GenerarObjeto(mapa,i,1)
@@ -53,12 +53,31 @@ def RenderizarMapa(mapa):
         print(fila)
 
 def LeerAccion():
-    accion = input("Elija una accion ('W','A','S','D' para el movimiento.): ")
-    while(accion.lower() != 'w' and accion.lower() != 's' and accion.lower() != 'a' and
-          accion.lower() != 'd'):
-        print("No existe tal accion. Intente denuevo.")
-        accion = input("Elija una accion ('W','A','S','D' para el movimiento.")
+    accionesValidas = {'w', 'a', 's', 'd'}
+    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
+    while accion not in accionesValidas:
+        print("Acción no válida. Intentálo de nuevo.")
+        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
     return accion
+
+def ValidarMovimiento(mapa, posicion_actual, accion):
+    filas = len(mapa)
+    columnas = len(mapa[0]) if filas > 0 else 0
+    
+    nueva_posicion = list(posicion_actual) 
+
+    if accion.lower() == "w":
+        nueva_posicion[0] -= 1
+    elif accion.lower() == "s":
+        nueva_posicion[0] += 1
+    elif accion.lower() == "a":
+        nueva_posicion[1] -= 1
+    elif accion.lower() == "d":
+        nueva_posicion[1] += 1
+    
+    if nueva_posicion[0] < 0 or nueva_posicion[0] >= filas or nueva_posicion[1] < 0 or nueva_posicion[1] >= columnas:
+        return False
+    return True
 
 def GetIndiceObjeto(mapa,objeto):
     indices = []
@@ -98,26 +117,23 @@ def MenuPrincipal():
     print("4. Salir")
     
 
-def PedirUserName(jugador_numero = 1):
-    # Función auxiliar para pedir un nombre de usuario válido
+def PedirUserName(jugador_numero=1):
     patron = r"^[a-zA-Z]{3,9}$"
-    
-    username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario.\nNo puede contener más de 10 caracteres ni menos de 3, ni números o caracteres especiales: ")
+    username = input(f"Jugador {jugador_numero}, ingrese su nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
     nombreValido = re.match(patron, username)
-    
+
     while nombreValido is None or any(user['Username'] == username for user in userRepository):
         if nombreValido is None:
             print(f"Nombre no válido para el Jugador {jugador_numero}. Inténtelo de nuevo.")
         else:
             print(f"El nombre de usuario ya está en uso. Intente con otro.")
-        username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario:\n")
+        username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario: ")
         nombreValido = re.match(patron, username)
-    
+
     GenerarUser(username)
     return username
 
 def PedirUserNames():
-    # Llama a la función auxiliar para ambos jugadores
     username1 = PedirUserName(1)
     username2 = PedirUserName(2)
     return username1, username2
@@ -133,7 +149,6 @@ def GenerarId():
     return id
 
 def PedirOpcion(min,max):
-    #pide una opcion(numero) al usuario y la devuelva
     opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     while opcion < min or opcion > max:
@@ -143,15 +158,13 @@ def PedirOpcion(min,max):
     return opcion
 
 def MostrarDificultades():
-    #muestre las dificultades disponibles
     print("Niveles de dificultad: ")
     print("1. Facil")
     print("2. Normal")
     print("3. Dificil")
     
 
-def nivelDeDificultad():
-    #Permite al usuario seleccionar una dificultad de las disponibles
+def NivelDeDificultad():
     MostrarDificultades()
     opcion = PedirOpcion(1,3)
 
@@ -168,18 +181,14 @@ def nivelDeDificultad():
 
     return dificultad
 
-    
-
 def ElegirTematica():
-    dificultad = nivelDeDificultad() 
+    dificultad = NivelDeDificultad()
     print("Temáticas disponibles:")
-    i = 1
-    for tematica in dificultad:
+    for i, tematica in enumerate(dificultad, 1):
         print(f"{i}: {tematica}")
-        i+=i
 
-    seleccion = PedirOpcion(1, len(dificultad)) 
-    MostrarIntroduccionALaTematica(dificultad[seleccion - 1]) 
+    seleccion = PedirOpcion(1, len(dificultad))
+    MostrarIntroduccionALaTematica(dificultad[seleccion - 1])
     return dificultad[seleccion - 1]
 
 def MostrarIntroduccionALaTematica(tematica):   
@@ -213,8 +222,19 @@ def MostrarIntroduccionALaTematica(tematica):
 }
     print(introducciones.get(tematica, "Introducción no disponible."))
 
-def inicializar_pistas():
-    # Diccionario de pistas
+    print("¿Deseas comenzar el juego o salir?")
+    print("1. Comenzar Juego")
+    print("2. Salir")
+    seleccion = PedirOpcion(1, 2)
+    if seleccion == 1:
+        print("Comenzando juego...")
+    elif seleccion == 2:
+        print("Saliendo...")
+        exit()
+    else:
+        print("Por favor, ingresá una opción válida.")
+
+def InicializarPistas():
     pistas = {
         "Breaking Bad": [
             "Busca en el laboratorio un objeto que brilla en la oscuridad.",
@@ -254,26 +274,18 @@ def inicializar_pistas():
 
 def MostrarPista(tematica, pistas, pistas_usadas):
     if tematica in pistas:
-        # filtra por las pistas no utilizadas
         disponibles = [pista for pista in pistas[tematica] if pista not in pistas_usadas[tematica]]
         
         if disponibles:
-            #elije una pista entre disponibles de forma aleatorias
             pista = random.choice(disponibles)
             print(f"Pista para {tematica}: {pista}")
-            # marca la pista como usada y la suma a la lista de pistas usadas
             pistas_usadas[tematica].append(pista)
         else:
             print(f"No hay más pistas disponibles para la temática '{tematica}'.")
     else:
         print(f"Temática '{tematica}' no válida.")
 
-
-def EntrarEnDesafio():
-    #Entra en un desafio dentro del 
-    pass
-
-def modificar_puntos(puntos, accion):
+def ModificarPuntos(puntos, accion):
     if accion == "usar_pista":
         return puntos - 100
     elif accion == "completar_desafio":
@@ -283,43 +295,58 @@ def modificar_puntos(puntos, accion):
     return puntos
 
 def ComenzarJuego(tematica):
-    #Funcion que comienza el juego para la tematica dada
     puntos = 1000
     Escapo = False
     mapa = []
-    #facil = ["Breaking Bad","Muerte Anunciada"]
-    #intermedio = ["Psiquiátrico","La Casa de Papel"]
-    #dificil = ["Sherlock Holmes","Misión Gubernamental"]
-    if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
-        mapa = GenerarMapa(4,5,4,6) 
-        while(not Escapo):
+    posicion_actual = [0, 0]
+
+    if tematica == "Breaking Bad" or tematica == "Muerte Anunciada":
+        mapa = GenerarMapa(4, 5, 4, 6)
+        while not Escapo:
             RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
+            accion = LeerAccion()
+            
+            if ValidarMovimiento(mapa, posicion_actual, accion):
+                AccionPersonaje(mapa, accion)
+                puntos = ModificarPuntos(puntos, accion)
+            else:
+                print("Movimiento inválido: fuera de los límites del mapa.")
             pass
-    elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
-        mapa = GenerarMapa(7,8,5,7)
-        while(not Escapo):
+
+    elif tematica == "Psiquiátrico" or tematica == "La Casa de Papel":
+        mapa = GenerarMapa(7, 8, 5, 7)
+        while not Escapo:
             RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
+            accion = LeerAccion()
+            
+            if ValidarMovimiento(mapa, posicion_actual, accion):
+                AccionPersonaje(mapa, accion)
+                puntos = ModificarPuntos(puntos, accion)
+                print(f"Puntos actuales: {puntos}")
+            else:
+                print("Movimiento inválido: fuera de los límites del mapa.")
             pass
-    elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
-        mapa = GenerarMapa(9,10,5,8)
-        while(not Escapo):
+
+    elif tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental":
+        mapa = GenerarMapa(9, 10, 5, 8)
+        while not Escapo:
             RenderizarMapa(mapa)
-            AccionPersonaje(mapa,LeerAccion())
+            accion = LeerAccion()
+            
+            if ValidarMovimiento(mapa, posicion_actual, accion):
+                AccionPersonaje(mapa, accion)
+                puntos = ModificarPuntos(puntos, accion)
+                print(f"Puntos actuales: {puntos}")
+            else:
+                print("Movimiento inválido: fuera de los límites del mapa.")
             pass
-    
-    #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
-    #if accion == "usar_pista": 
-    #    puntos = modificar_puntos(puntos, "usar_pista")
-    #elif accion == "completar_desafio": 
-    #    puntos = modificar_puntos(puntos, "completar_desafio")
-    #elif accion == "accion_correcta":
-    #    puntos = modificar_puntos(puntos, "accion_correcta")
 
 def Instrucciones():
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
-    print("Buena Suerte, la vas a necesitar.")
+    print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
+    print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
+    print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
+    print("Buena suerte, la vas a necesitar.")
 
 def main():
 
