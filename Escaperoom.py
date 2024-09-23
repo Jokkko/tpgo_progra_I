@@ -338,7 +338,8 @@ def ComenzarJuego(tematica):
 
         if accion == "menu":
             print("Saliendo al menu principal...")
-            Escapo = True, puntos = 0
+            Escapo = True
+            puntos = 0
             
         elif ValidarMovimiento(mapa, posicion_actual, accion):        
             AccionPersonaje(mapa,accion)
