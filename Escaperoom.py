@@ -155,6 +155,7 @@ def PedirOpcion(min,max):
         print("Error")
         opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
+    print()
     return opcion
 
 def MostrarDificultades():
@@ -294,52 +295,59 @@ def ModificarPuntos(puntos, accion):
         return puntos + 10
     return puntos
 
+def MapaParaTematica(tematica):
+    mapa = []
+    if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
+        mapa = GenerarMapa(4,5,4,6) 
+    elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
+        mapa = GenerarMapa(7,8,5,7)
+    elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
+        mapa = GenerarMapa(9,10,5,8)
+    return mapa
+
+def ContieneElementos(lista1, lista2):
+    ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
+    #Se recorre en el largo de lista2 (Para poder recorrer toda la segunda lista), se le resta el largo de la primera lista (para poder mirar desde i + el largo de lista1 sin pasarnos del indice)
+    for i in range(0,len(lista2) - len(lista1) + 1,2):
+        if lista2[i:i+len(lista1)] == lista1: 
+        # Aca se extrae de la lista 2 en indice i, hasta i + el largo de lista1, si esa extraccion es igual a la lista1, entnces la lista 1 esta en la lista dos de forma secuencial
+            return True
+    return False
+
 def ComenzarJuego(tematica):
     puntos = 1000
     Escapo = False
-    mapa = []
-    posicion_actual = [0, 0]
-
-    if tematica == "Breaking Bad" or tematica == "Muerte Anunciada":
-        mapa = GenerarMapa(4, 5, 4, 6)
-        while not Escapo:
-            RenderizarMapa(mapa)
-            accion = LeerAccion()
-            
-            if ValidarMovimiento(mapa, posicion_actual, accion):
-                AccionPersonaje(mapa, accion)
-                puntos = ModificarPuntos(puntos, accion)
-            else:
-                print("Movimiento inválido: fuera de los límites del mapa.")
+    pistas, pistas_usadas = InicializarPistas()
+    mapa = MapaParaTematica(tematica)
+    objetos = ["#","$"]
+    for i in objetos:
+        if(i=="#"):
+            indicesPistas = GetIndiceObjeto(mapa,i) 
+        else:
+            indicesCandados = GetIndiceObjeto(mapa,i)
+    
+    while not Escapo:
+        posicion_actual = GetIndiceObjeto(mapa,"O")
+        print(pistas_usadas.get(tematica))
+        if(ContieneElementos(posicion_actual, indicesPistas)): 
+            MostrarPista(tematica, pistas, pistas_usadas)
+        elif(ContieneElementos(posicion_actual, indicesCandados)):
             pass
-
-    elif tematica == "Psiquiátrico" or tematica == "La Casa de Papel":
-        mapa = GenerarMapa(7, 8, 5, 7)
-        while not Escapo:
-            RenderizarMapa(mapa)
-            accion = LeerAccion()
+        RenderizarMapa(mapa)
+        accion = LeerAccion()
             
-            if ValidarMovimiento(mapa, posicion_actual, accion):
-                AccionPersonaje(mapa, accion)
-                puntos = ModificarPuntos(puntos, accion)
-                print(f"Puntos actuales: {puntos}")
-            else:
-                print("Movimiento inválido: fuera de los límites del mapa.")
-            pass
-
-    elif tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental":
-        mapa = GenerarMapa(9, 10, 5, 8)
-        while not Escapo:
-            RenderizarMapa(mapa)
-            accion = LeerAccion()
-            
-            if ValidarMovimiento(mapa, posicion_actual, accion):
-                AccionPersonaje(mapa, accion)
-                puntos = ModificarPuntos(puntos, accion)
-                print(f"Puntos actuales: {puntos}")
-            else:
-                print("Movimiento inválido: fuera de los límites del mapa.")
-            pass
+        if ValidarMovimiento(mapa, posicion_actual, accion):        
+            AccionPersonaje(mapa,accion)
+        else:
+            print("Movimiento inválido: fuera de los límites del mapa.")
+    
+    #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
+    #if accion == "usar_pista": 
+    #    puntos = modificar_puntos(puntos, "usar_pista")
+    #elif accion == "completar_desafio": 
+    #    puntos = modificar_puntos(puntos, "completar_desafio")
+    #elif accion == "accion_correcta":
+    #    puntos = modificar_puntos(puntos, "accion_correcta")
 
 def Instrucciones():
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
