@@ -14,10 +14,7 @@ def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     anchoMinimoDelMapa = random.randint(anchoMin,anchoMax) 
 
     for _ in range(altoDelMapa):
-        fila = []
-        for _ in range(anchoMinimoDelMapa):
-            fila.append(terreno)
-        mapa.append(fila)
+        mapa.append([terreno for _ in range(anchoMinimoDelMapa)])
 
 def GenerarObjeto(mapa,objeto,cantidad):
     '''
@@ -145,7 +142,7 @@ def MenuPrincipal(user):
     print("2. Ranking de puntos")
     print("3. Como Jugar")
     print("4. Salir")
-    
+ 
 
 def PedirUserName(jugador_numero=1):
     '''
