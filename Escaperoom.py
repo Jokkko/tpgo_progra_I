@@ -7,7 +7,7 @@ vaciarConsola = "\n" * 50
 
 def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     '''
-    Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por parametro
+    Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por una variable global
     el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
     '''
     altoDelMapa = random.randint(alturaMin,alturaMax)
@@ -20,6 +20,10 @@ def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
         mapa.append(fila)
 
 def GenerarObjeto(mapa,objeto,cantidad):
+    '''
+    Recibe un mapa (matriz), un objeto (caracter string) cantidad (int) Y genera en x posiciones aleatoria del mapa el objeto pasado por parametro
+    x es definida por cantidad
+    '''
     columnaSpawn = random.randint(0,len(mapa)-1) 
     filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
     for _ in range(cantidad):
@@ -49,10 +53,17 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
     return mapa
 
 def RenderizarMapa(mapa):
+    '''
+    Muestra la salida por consola de una mapa (matriz) recibido por parametro
+    '''
     for fila in mapa:
         print(fila)
 
 def LeerAccion():
+    '''
+    Lee de la entrada un string ingresado por el usuario, verifica que este dentro de las acciones validas ('w', 'a', 's', 'd','menu')
+    y devuelve la accion validada
+    '''
     accionesValidas = {'w', 'a', 's', 'd','menu'}
     accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     while accion not in accionesValidas:
@@ -61,6 +72,10 @@ def LeerAccion():
     return accion
 
 def ValidarMovimiento(mapa, posicion_actual, accion):
+    '''
+    Recibe por parametro un mapa (matriz) una posicion_actual (lista) que hacen referencia a los ejes x y de una matriz, y recibe una accion
+    'w', 'a', 's', 'd' verifica que la matriz desde la posicion_actual tenga espacio para moverse en cada eje segun w a s d
+    '''
     filas = len(mapa)
     columnas = len(mapa[0]) if filas > 0 else 0
     
@@ -80,6 +95,10 @@ def ValidarMovimiento(mapa, posicion_actual, accion):
     return True
 
 def GetIndiceObjeto(mapa,objeto):
+    '''
+    Recibe por parametro un mapa y un objeto, se encarga de guardar todos los pares [x y] donde ese objeto se encuentre en la matriz y los devuelve
+    en una lista 
+    '''
     indices = []
     for y in range(len(mapa)):
         for x in range(len(mapa[y])):
@@ -89,12 +108,19 @@ def GetIndiceObjeto(mapa,objeto):
     return indices
 
 def MoverObjeto(mapa,x,y,objeto):
+    '''
+    Mueve a un objeto recibido por parametro dentro de la matriz mapa tambien recibida por parametro, tantas veces en x como diga el parametro
+    y tantas veces en y como diga el parametro.
+    '''
     #terreno = " "
     coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
     mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
     mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
 
 def AccionPersonaje(mapa,accion): 
+    '''
+    Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion MoverObjeto, para mover al personaje segun la accion elegida
+    '''
     personaje = "O"
     
     if  (accion == "w"):
@@ -107,10 +133,14 @@ def AccionPersonaje(mapa,accion):
         MoverObjeto(mapa,1,0,personaje)
 
 
-def MenuPrincipal():
+def MenuPrincipal(user):
+    '''
+    Funcion que se encarga de mostrar el menu principal del juego
+    '''
     #muestre las opciones del menu
     #se puede usar center aca
-    print("Bienvenido a ESCAPEROOM SIMULATOR")
+    print()
+    print(f"{user} Bienvenido a UadEscape")
     print("1. Comenzar Juego")
     print("2. Ranking de puntos")
     print("3. Como Jugar")
@@ -118,6 +148,10 @@ def MenuPrincipal():
     
 
 def PedirUserName(jugador_numero=1):
+    '''
+    Funcion que recibe por parametro el numero de jugado que va a jugar , pedir al usuario que ingrese el nombre, y generarlo
+    devuelve el nombre de usuario validado 
+    '''
     patron = r"^[a-zA-Z]{3,9}$"
     username = input(f"Jugador {jugador_numero}, ingrese su nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
     nombreValido = re.match(patron, username)
@@ -134,14 +168,21 @@ def PedirUserName(jugador_numero=1):
     return username
 
 def PedirUserNames():
+    '''Funcion auxiliar que  se encarga de pedir y generar dos usernames, para dos jugadores, los devuelve'''
     username1 = PedirUserName(1)
     username2 = PedirUserName(2)
     return username1, username2
 
 def GenerarUser(username):
+    '''
+    Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
+    '''
     userRepository.append(dict(Username=username,Id = GenerarId() ))
 
 def GenerarId():
+    '''
+    Funcion que genera un id para un usuario, a partir del ultimo id ingresado
+    '''
     id = 0
     if(len(userRepository) != 0):
         ultimo = len(userRepository)-1 
@@ -149,6 +190,9 @@ def GenerarId():
     return id
 
 def PedirOpcion(min,max):
+    '''
+    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
+    '''
     opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     while opcion < min or opcion > max:
@@ -159,6 +203,9 @@ def PedirOpcion(min,max):
     return opcion
 
 def MostrarDificultades():
+    '''
+    Funcion que se encarga de mostrar los distintos niveles de dificultad
+    '''
     print("Niveles de dificultad: ")
     print("1. Facil")
     print("2. Normal")
@@ -166,6 +213,9 @@ def MostrarDificultades():
     
 
 def NivelDeDificultad():
+    '''
+    Funcion que se encarga de pedirle al usuario que ingrese que dificultad quiere elegir y que devuelve las distintas tematicas segun la dificutald
+    '''
     MostrarDificultades()
     opcion = PedirOpcion(1,3)
 
@@ -183,6 +233,10 @@ def NivelDeDificultad():
     return dificultad
 
 def ElegirTematica():
+    '''
+    Funcion que se encarga de pedirle a un usuario que ingrese que tematica quiere jugar, segun que dificultad anteriormente eligio.
+    Ademas se le mostrara una introduccion a la tematica elegida. Y luego se devuelve la tematica elegida
+    '''
     dificultad = NivelDeDificultad()
     print("Temáticas disponibles:")
     for i, tematica in enumerate(dificultad, 1):
@@ -193,6 +247,9 @@ def ElegirTematica():
     return dificultad[seleccion - 1]
 
 def MostrarIntroduccionALaTematica(tematica):   
+    '''
+    Funcion que se encarga de mostrar la introduccion a una tematica
+    '''
     introducciones = {
     "Breaking Bad": "Te encontrás en el laboratorio de metanfetaminas de Walter White.\n"
                     "Tu misión es encontrar la fórmula secreta antes de que la DEA llegue.\n"
@@ -236,6 +293,10 @@ def MostrarIntroduccionALaTematica(tematica):
         print("Por favor, ingresá una opción válida.")
 
 def InicializarPistas():
+    '''
+    Funcion que se encarga de incializar las distintas pistas para que el usuario pueda utilizarlas en el juego. Devuelve las pistas disponibles
+    y las usadas
+    '''
     pistas = {
         "Breaking Bad": [
             "Busca en el laboratorio un objeto que brilla en la oscuridad.",
@@ -261,7 +322,7 @@ def InicializarPistas():
         ],
         "Sherlock Holmes": [
             "La carta en la mesa contiene un mensaje cifrado; decodifícalo.",
-            "No todos los sospechosos son lo que parecen; investiga sus alibis."
+            "No todos los sospechosos son lo que parecen; investiga sus coartadas."
         ],
         "Misión Gubernamental": [
             "Un dispositivo escondido puede cambiar el curso de la misión; búscalo.",
@@ -274,6 +335,9 @@ def InicializarPistas():
     return pistas, pistas_usadas
 
 def MostrarPista(tematica, pistas, pistas_usadas):
+    '''
+    Funcion que recibe una tematica, pistas para la misma, y las pistas que fueron usadas, se encarga de mostrar una pista aleatoria de las disopnibles
+    '''
     if tematica in pistas:
         disponibles = [pista for pista in pistas[tematica] if pista not in pistas_usadas[tematica]]
         
@@ -286,18 +350,90 @@ def MostrarPista(tematica, pistas, pistas_usadas):
     else:
         print(f"Temática '{tematica}' no válida.")
 
-def ModificarPuntos(puntos, accion):
-    if accion == "usar_pista":
-        return puntos - 100
-    elif accion == "completar_desafio":
-        return puntos + 50
-    elif accion == "accion_correcta":
-        return puntos + 10
+def MostrarDesafio(tematica, desafios, desafios_usados):
+    '''
+    Funcion que recibe una tematica, desafios para la misma, y los desafios que fueron usados,
+      se encarga de mostrar un desafio aleatorio de los disponibles
+    '''
+    Fallo = True
+    if tematica in desafios:
+        disponibles = [desafios for desafios in desafios[tematica] if desafios not in desafios_usados[tematica]]
+        
+        if disponibles:
+            desafios = random.choice(disponibles) 
+            while Fallo:
+                desafio = list(desafios.split("|"))
+                print(f"{desafio[1]}")
+                opcion = PedirOpcion(1,3)
+                if(int(desafio[0])==opcion):
+                    Fallo = False
+
+            desafios_usados[tematica].append(desafios)
+        else:
+            print(f"No hay más desafios disponibles para la temática '{tematica}'.")
     else:
-        return puntos - 10
+        print(f"Temática '{tematica}' no válida.")
+
+def InicializarDesafios():
+    '''
+    Funcion que se encarga de incializar los distintos desafios para que el usuario pueda utilizarlos en el juego.
+    Devuelve los desafios disponibles y los jugados
+    '''
+    desafios = {
+        "Breaking Bad": [
+            "2|Entras en el laboratorio y en la oscuridad comienzas a mirar tu alrededor ¿Que haces?\n1.Prender la luz\t\t2.Mirar a tu alrededor\t\t3.Gritar",
+            "2|Encuentras unas cajas que puedes abrir, al revisarlas encuentras distintos objetos, ¿Cual agarras?\n1.Libro de cocina\t\t2.Equipo de proteccion personal\t\t3.Efectivo",
+            "3|En el escritorio encontras muchas cosas tiradas, ¿Cual agarras? \n1.Una bolsa con cristales extraños\t\t2.Libros de ciencia\t\t3.Unas carpetas con documentos",
+            "2|En un costado encontras muchas cosas de quimica, ¿Que investigas? \n1.Anotaciones con formulas\t\t2.Unos frascos con liquido brillante\t\t3.Un mechero"
+        ],
+        "Muerte Anunciada": [
+            "2|Estas en una habitacion con 3 puertas, estas dan a otras habitaciones ¿Cual Investigamos? \n1.El baño\t\t2.Una habitacion donde parece que hubo una fiesta\t\t3.Una habitacion antigua",
+            "2|En la habitacion hay mucha gente, ¿Que deseas hacer? \n1.Hablar con ellos\t\t2.Escuchar sus converzaciones\t\t3.Gritarles que hagan silencio",
+            "3|Miras al suelo y visualizas muchas cosas tiradas, ¿Que agarras? \n1.Latas de cerveza vacias\t\t2.Posters antiguos\t\t3.Unos periodicos igual de antiguos",
+            "2|Entras en una habitacion que parece muy antigua y encontras diversos objetos, ¿Con cual te quedas?. \n1.Una pelota de basket\t\t2.Un objeto extraño que parece abandonado\t\t3.Un peluche destrozado"
+        ],
+        "Psiquiátrico": [
+            "3|Estas dentro de una habitacion con muchas puertas ¿Que haces para no perderte?\n1.Entras siempre en la habitacion de la derecha\t\t2.Haces izquierda derecha en bucle\t\t3.Seguis unas marcas en la pared",
+            "1|Encontraste los diarios de los distintos pacientes, ¿Cual agarras?\n1.El del ultimo paciente\t\t2.Uno aleatorio\t\t3.El diario del primer paciente",
+            "1|Miras la pared y observas algunas cosas en la pared, ¿Alguna hara algo? \n1.Mover los cuadros\t\t2.Mirar por la ventana\t\t3.Intentar romper la ventana"
+        ],
+        "La Casa de Papel": [
+            "3|Tenemos que encontrar una forma de escapar y tenemos solo 3 objetos, ¿Que podriamos usar para escapar?\n1.Fuerza Bruta \t\t2.Usar a los rehenes \t\t3.El plano del banco",
+            "1|Hay unas rejas adelante sin embargo parecen debiles, ¿Como podriamos romperlas?\n1.Pedirle a Helsinki que las rompa\t\t2.Dispararles \t\t3.Darles una patada ",
+            "1|El pasillo esta lleno de guardias, ¿Que hacemos?\n1.Entrar en la sala de camaras \t\t2.Seguir por el pasillo con sigilo \t\t3.Quedarse escondido"
+        ],
+        "Sherlock Holmes": [
+            "3|Hay una carta con un mensaje, dice '\n murcielago\n 0123456789\n y abajo pone este texto b9t9n 70724669' ¿Que boton presionamos?\n1.El boton Turquesa \t\t2.El boton Celeste \t\t3.El boton Amarillo",
+            "3|El primer sospechoso dijo que estaba en su casa. Sin embargo, no me convence ¿Que deberia hacer?\n1.Creerle \t\t2.Obligarle a decir la verdad \t\t3.Investigar a fondo "
+        ],
+        "Misión Gubernamental": [
+            "3|Te encuentras en la habitacion, y ves un escritorio, te parece un buen comienzo ¿Que haces?\n1.Revisas los cajones \t\t2.Abres las puertas del escritorio \t\t3.Miras por abajo",
+            "3|En esta hoja dice que no hay ningun canal seguro, sin embargo algo me dice lo contrario ¿Que canal probamos?\n1.D4NG3R \t\t2.3ST3 N0 \t\t3.S4F3"
+        ]
+    }
+
+    desafios_usados = {key: [] for key in desafios.keys()}
+    
+    return desafios, desafios_usados
+
+def ModificarPuntos(puntos, accion):
+    '''
+    Modifica los puntos pasados por parametros segun la accion pasada por parametros, luego devuelve los puntos modificados
+    '''
+    if accion == "usar_pista":
+        puntos -= 100
+    elif accion == "completar_desafio":
+        puntos += 500
+    elif accion == "accion_correcta":
+        puntos += 10
+    else:
+        puntos -= 10
     return puntos
 
 def MapaParaTematica(tematica):
+    '''
+    Genera un mapa aleatorio para una tematica recibida por parametro
+    '''
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = GenerarMapa(4,5,4,6) 
@@ -317,9 +453,13 @@ def ContieneElementos(lista1, lista2):
     return False
 
 def ComenzarJuego(tematica):
+    '''
+    Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
+    '''
     puntos = 1000
     Escapo = False
     pistas, pistas_usadas = InicializarPistas()
+    desafios, desafios_usadas =InicializarDesafios()
     mapa = MapaParaTematica(tematica)
     objetos = ["#","$"]
     for i in objetos:
@@ -330,35 +470,38 @@ def ComenzarJuego(tematica):
     
     while not Escapo:
         posicion_actual = GetIndiceObjeto(mapa,"O")
-        print(pistas_usadas.get(tematica))
+        if(len(pistas_usadas.get(tematica)) == 0):
+            print("Cuando encuentres una pista aparecera aca")
+        else:
+            print(pistas_usadas.get(tematica))
+            
+        
         if(ContieneElementos(posicion_actual, indicesPistas)): 
+            print("----PISTA ENCONTRADA----")
             MostrarPista(tematica, pistas, pistas_usadas)
+            puntos = ModificarPuntos(puntos, "usar_pista")
         elif(ContieneElementos(posicion_actual, indicesCandados)):
-            pass
+            MostrarDesafio(tematica, desafios, desafios_usadas)
+            puntos = ModificarPuntos(puntos, "completar_desafio")
         RenderizarMapa(mapa)
         accion = LeerAccion()
-        if accion == 'menu':
+        print(vaciarConsola)
+        if accion == "menu":
             print("Saliendo al menu principal...")
             Escapo = True
             puntos = 0
-            
-        if ValidarMovimiento(mapa, posicion_actual, accion):        
+        elif ValidarMovimiento(mapa, posicion_actual, accion):   
             AccionPersonaje(mapa,accion)
             puntos = ModificarPuntos(puntos,accion)
             print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
     return puntos
-    
-    #esto deberiamos definirlo mejor cuando tengamos todo el develop actualizado 
-    #if accion == "usar_pista": 
-    #    puntos = modificar_puntos(puntos, "usar_pista")
-    #elif accion == "completar_desafio": 
-    #    puntos = modificar_puntos(puntos, "completar_desafio")
-    #elif accion == "accion_correcta":
-    #    puntos = modificar_puntos(puntos, "accion_correcta")
 
 def Instrucciones():
+    '''
+    Muestra las instrucciones para poder jugar al juego
+    '''
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
     print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
@@ -366,18 +509,14 @@ def Instrucciones():
     print("Buena suerte, la vas a necesitar.")
 
 def main():
-
-    ##PARA TESTEAR MOVIMIENTO
-    #mapa = GenerarMapa(6,11,8,16)
-    #while(True): 
-    #    print(vaciarConsola)
-    #    RenderizarMapa(mapa)
-    #    AccionPersonaje(mapa,LeerAccion())
-    PedirUserName()
+    '''
+    Programa Principal
+    '''
+    user = PedirUserName()
     jugando = True
     tematica = 0
     while(jugando):
-        MenuPrincipal()
+        MenuPrincipal(user)
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
             tematica = ElegirTematica()
