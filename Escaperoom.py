@@ -68,7 +68,7 @@ def LeerAccion():
     accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     while accion not in accionesValidas:
         print("Acción no válida. Intentálo de nuevo.")
-        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento): ").lower()
+        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     return accion
 
 def ValidarMovimiento(mapa, posicion_actual, accion):
@@ -428,7 +428,6 @@ def ModificarPuntos(puntos, accion):
         puntos += 10
     else:
         puntos -= 10
-    
     return puntos
 
 def MapaParaTematica(tematica):
@@ -491,13 +490,12 @@ def ComenzarJuego(tematica):
             print("Saliendo al menu principal...")
             Escapo = True
             puntos = 0
-        elif ValidarMovimiento(mapa, posicion_actual, accion):         
+        elif ValidarMovimiento(mapa, posicion_actual, accion):   
             AccionPersonaje(mapa,accion)
-            puntos = ModificarPuntos(puntos, accion)
+            puntos = ModificarPuntos(puntos,accion)
             print(f"Puntos actuales: {puntos}")
         else:
             print("Movimiento inválido: fuera de los límites del mapa.")
-    
     return puntos
 
 def Instrucciones():
