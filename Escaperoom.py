@@ -140,7 +140,7 @@ def MenuPrincipal(user):
     #muestre las opciones del menu
     #se puede usar center aca
     print()
-    print(f"Bienvenido {user} a ESCAPEROOM SIMULATOR")
+    print(f"{user} Bienvenido a UadEscape")
     print("1. Comenzar Juego")
     print("2. Ranking de puntos")
     print("3. Como Jugar")
