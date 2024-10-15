@@ -172,20 +172,24 @@ def GenerarUser(username):
     '''
     Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
     '''
-    with open("userRepository.json","r") as userRepositoryArchivo:
-        userRepository=json.load(userRepositoryArchivo)
-    
-    userRepository = list(userRepository)
+    try:
+        with open("userRepository.json","r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
+        userRepository = list(userRepository)
 
-    while any(user['Username'] == username for user in userRepository):
-        print(f"El nombre de usuario ya está en uso. Intente con otro.")
-        username= PedirUserName()
-    
+        while any(user['Username'] == username for user in userRepository):
+            print(f"El nombre de usuario ya está en uso. Intente con otro.")
+            username= PedirUserName()
+        
+        with open("userRepository.json","w") as userRepositoryArchivo:
+            userRepository.append(dict(Username=username,Id = GenerarId(userRepository),Puntos = 0 ))
+            json.dump(userRepository,userRepositoryArchivo)
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
 
-    with open("userRepository.json","w") as userRepositoryArchivo:
-        userRepository.append(dict(Username=username,Id = GenerarId(userRepository),Puntos = 0 ))
-        json.dump(userRepository,userRepositoryArchivo)
-    
+        
 
 
 def GenerarId(userRepository):
@@ -518,17 +522,23 @@ def Instrucciones():
     print("Buena suerte, la vas a necesitar.")
 
 def registrarPuntos(user,puntos):
-    with open("userRepository.json",mode="r") as userRepositoryArchivo:
-        userRepository=json.load(userRepositoryArchivo)
-    
-    jugador = list(filter(lambda x: x['Username']==user,userRepository))
-    if(puntos > jugador[0]["Puntos"]):
-        for users in userRepository:
-            if(users['Id'] == jugador[0]['Id'] ):
-                users['Puntos'] = puntos
+    try:
+        with open("userRepository.json",mode="r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
         
-        with open("userRepository.json","w") as userRepositoryArchivo:
-            json.dump(userRepository,userRepositoryArchivo)
+        jugador = list(filter(lambda x: x['Username']==user,userRepository))
+        if(puntos > jugador[0]["Puntos"]):
+            for users in userRepository:
+                if(users['Id'] == jugador[0]['Id'] ):
+                    users['Puntos'] = puntos
+            
+            with open("userRepository.json","w") as userRepositoryArchivo:
+                json.dump(userRepository,userRepositoryArchivo)
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
+
 
 def FirstsLastsRanking(users,firsts):
     usersOrdered = list(sorted(users,key= lambda x: x["Puntos"],reverse=firsts))
@@ -569,9 +579,14 @@ def Last10Ranking(users):
 '''
 
 def Ranking(user):
-    with open("userRepository.json",mode="r") as userRepositoryArchivo:
-        userRepository=json.load(userRepositoryArchivo)
-        RankList = [user for user in list(userRepository)]
+    try:
+        with open("userRepository.json",mode="r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
+            RankList = [user for user in list(userRepository)]
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
     
     opcion = 0
     while(opcion != 5):
