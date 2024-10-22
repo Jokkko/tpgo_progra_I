@@ -1,8 +1,8 @@
 import random
 import re
+import json
 
 terreno = " "
-userRepository = []
 vaciarConsola = "\n" * 50
 
 def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
@@ -144,24 +144,22 @@ def MenuPrincipal(user):
     print("4. Salir")
  
 
-def PedirUserName(jugador_numero=1):
+def PedirUserName(jugador_numero=0):
     '''
     Funcion que recibe por parametro el numero de jugado que va a jugar , pedir al usuario que ingrese el nombre, y generarlo
     devuelve el nombre de usuario validado 
     '''
     patron = r"^[a-zA-Z]{3,9}$"
-    username = input(f"Jugador {jugador_numero}, ingrese su nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
+    Bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido Jugador {jugador_numero}") 
+    Bienvenida(jugador_numero)
+    username = input(f"Jugador, ingrese un nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
     nombreValido = re.match(patron, username)
 
-    while nombreValido is None or any(user['Username'] == username for user in userRepository):
+    while nombreValido is None:
         if nombreValido is None:
-            print(f"Nombre no válido para el Jugador {jugador_numero}. Inténtelo de nuevo.")
-        else:
-            print(f"El nombre de usuario ya está en uso. Intente con otro.")
-        username = input(f"Jugador {jugador_numero}, por favor, ingrese su nombre de usuario: ")
+            print(f"Nombre no válido. Inténtelo de nuevo.")
+        username = input(f"Jugador, por favor, ingrese un nombre de usuario: ")
         nombreValido = re.match(patron, username)
-
-    GenerarUser(username)
     return username
 
 def PedirUserNames():
@@ -174,9 +172,27 @@ def GenerarUser(username):
     '''
     Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
     '''
-    userRepository.append(dict(Username=username,Id = GenerarId() ))
+    try:
+        with open("userRepository.json","r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
+        userRepository = list(userRepository)
 
-def GenerarId():
+        while any(user['Username'] == username for user in userRepository):
+            print(f"El nombre de usuario ya está en uso. Intente con otro.")
+            username= PedirUserName()
+        
+        with open("userRepository.json","w") as userRepositoryArchivo:
+            userRepository.append(dict(Username=username,Id = GenerarId(userRepository),Puntos = 0 ))
+            json.dump(userRepository,userRepositoryArchivo)
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
+
+        
+
+
+def GenerarId(userRepository):
     '''
     Funcion que genera un id para un usuario, a partir del ultimo id ingresado
     '''
@@ -505,11 +521,104 @@ def Instrucciones():
     print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
     print("Buena suerte, la vas a necesitar.")
 
+def registrarPuntos(user,puntos):
+    try:
+        with open("userRepository.json",mode="r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
+        
+        jugador = list(filter(lambda x: x['Username']==user,userRepository))
+        if(puntos > jugador[0]["Puntos"]):
+            for users in userRepository:
+                if(users['Id'] == jugador[0]['Id'] ):
+                    users['Puntos'] = puntos
+            
+            with open("userRepository.json","w") as userRepositoryArchivo:
+                json.dump(userRepository,userRepositoryArchivo)
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
+
+
+def FirstsLastsRanking(users,firsts):
+    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"],reverse=firsts))
+    if(firsts):
+        x=1
+    else:
+        x=len(usersOrdered)
+    
+    rank = usersOrdered[:10]
+    
+    print(f"\tPuesto\t - \tNombre\t - \tPuntuacion Máxima")
+    for users in rank:
+        print(f"\t{x}\t - \t{users['Username']}\t - \t{users['Puntos']}")
+        if(firsts):
+            x+=1
+        else:
+            x-=1
+
+def RankingJugador(users,username = None):
+    if(username is None):
+        username = PedirUserName()
+
+    jugador = list(filter(lambda x: x['Username']==username,users))
+    try:
+        print(f"{jugador[0]['Username']} tiene {jugador[0]['Puntos']} de puntuacion maxima.")
+    except:
+        print("El jugador no existe")
+
+'''
+def Last10Ranking(users):
+    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"]))
+    x=len(usersOrdered)
+    last10 = usersOrdered[:10]
+    print(f"# - Nombre - Puntuacion Máxima")
+    for users in last10:
+        print(f"{x} - {users['Username']} - {users['Puntos']}")
+        x-=1
+'''
+
+def Ranking(user):
+    try:
+        with open("userRepository.json",mode="r") as userRepositoryArchivo:
+            userRepository=json.load(userRepositoryArchivo)
+            RankList = [user for user in list(userRepository)]
+    except IOError:
+        print("Error, no se pudo abrir el archivo")
+    except FileNotFoundError:
+        print("Error, no se encontro el archivo")
+    
+    opcion = 0
+    while(opcion != 5):
+        print()
+        print("1. Ver mejores puntuaciones.")
+        print("2. Buscar jugador.")
+        print("3. Ver peores puntuaciones.")
+        print("4. Mi mejor puntuacion.")
+        print("5. Salir.")
+        opcion = PedirOpcion(1,5)
+        print()
+
+        if(opcion == 1):
+            FirstsLastsRanking(RankList,True)
+        elif (opcion == 2):
+            RankingJugador(RankList)
+        elif (opcion == 3):
+            FirstsLastsRanking(RankList,False)
+        elif (opcion == 4):
+            RankingJugador(RankList,user)
+        elif (opcion == 5):
+            print("Saliendo...")
+        else:
+            print("Opcion inexistente.")
+
+
 def main():
     '''
     Programa Principal
     '''
     user = PedirUserName()
+    GenerarUser(user)
     jugando = True
     tematica = 0
     while(jugando):
@@ -520,10 +629,11 @@ def main():
             puntos = ComenzarJuego(tematica)
             if puntos > 0:
                 print("Felicidades, escapaste")
+                registrarPuntos(user,puntos)
             else:
                 print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
-           pass
+            Ranking(user)
         elif (opcion == 3):
             Instrucciones()
         elif (opcion == 4):
