@@ -306,46 +306,14 @@ def MostrarIntroduccionALaTematica(tematica):
         print("Por favor, ingresá una opción válida.")
 
 def InicializarPistas():
-    '''
-    Funcion que se encarga de incializar las distintas pistas para que el usuario pueda utilizarlas en el juego. Devuelve las pistas disponibles
-    y las usadas
-    '''
-    pistas = {
-        "Breaking Bad": [
-            "Busca en el laboratorio un objeto que brilla en la oscuridad.",
-            "El equipo de protección personal es clave para el éxito. Revisa las cajas.",
-            "Las fórmulas están escondidas en los documentos; no olvides mirar en las carpetas.",
-            "La química puede ser peligrosa. Estudia los frascos con atención."
-        ],
-        "Muerte Anunciada": [
-            "Revisa la habitación donde se celebró la fiesta, hay más de lo que parece.",
-            "Algunos invitados saben más de lo que dicen. Escucha con atención.",
-            "Los periódicos antiguos pueden contener pistas sobre el asesinato.",
-            "Un objeto olvidado podría ser la clave para resolver el misterio."
-        ],
-        "Psiquiátrico": [
-            "Las habitaciones son un laberinto; sigue las marcas en la pared.",
-            "El diario del último paciente podría revelarte información crucial.",
-            "Revisa los cuadros; algunos pueden esconder secretos oscuros."
-        ],
-        "La Casa de Papel": [
-            "El plano del banco tiene detalles que podrían ser útiles. No lo ignores.",
-            "Cada miembro del equipo tiene una habilidad única; úsalas a tu favor.",
-            "Hay cámaras en todo el lugar; busca la manera de desactivarlas."
-        ],
-        "Sherlock Holmes": [
-            "La carta en la mesa contiene un mensaje cifrado; decodifícalo.",
-            "No todos los sospechosos son lo que parecen; investiga sus coartadas."
-        ],
-        "Misión Gubernamental": [
-            "Un dispositivo escondido puede cambiar el curso de la misión; búscalo.",
-            "Las comunicaciones pueden estar interceptadas. Encuentra el canal seguro."
-        ]
-    }
-
+   try:
+    with open("pistas.json", "r") as archivo:
+        pistas = json.load(archivo)
     pistas_usadas = {key: [] for key in pistas.keys()}
-    
     return pistas, pistas_usadas
+   except FileNotFoundError:
+       print("No se encuentra el archivo de las pistas")
+       return {}
 
 def MostrarPista(tematica, pistas, pistas_usadas):
     '''

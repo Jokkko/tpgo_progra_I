@@ -1,0 +1,32 @@
+{
+    "Breaking Bad": [
+        "Busca en el laboratorio un objeto que brilla en la oscuridad.",
+        "El equipo de proteccion personal es clave para el exito. Revisa las cajas.",
+        "Las formulas están escondidas en los documentos; no olvides mirar en las carpetas.",
+        "La quimica puede ser peligrosa. Estudia los frascos con atencion."
+    ],
+    "Muerte Anunciada": [
+        "Revisa la habitacion donde se celebro la fiesta, hay mas de lo que parece.",
+        "Algunos invitados saben mas de lo que dicen. Escucha con atencion.",
+        "Los periodicos antiguos pueden contener pistas sobre el asesinato.",
+        "Un objeto olvidado podria ser la clave para resolver el misterio."
+    ],
+    "Psiquiátrico": [
+        "Las habitaciones son un laberinto; sigue las marcas en la pared.",
+        "El diario del ultimo paciente podria revelarte informacion crucial.",
+        "Revisa los cuadros; algunos pueden esconder secretos oscuros."
+    ],
+    "La Casa de Papel": [
+        "El plano del banco tiene detalles que podrian ser utiles. No lo ignores.",
+        "Cada miembro del equipo tiene una habilidad unica; usalas a tu favor.",
+        "Hay camaras en todo el lugar; busca la manera de desactivarlas."
+    ],
+    "Sherlock Holmes": [
+        "La carta en la mesa contiene un mensaje cifrado; decodificalo.",
+        "No todos los sospechosos son lo que parecen; investiga sus coartadas."
+    ],
+    "Misión Gubernamental": [
+        "Un dispositivo escondido puede cambiar el curso de la mision; buscalo.",
+        "Las comunicaciones pueden estar interceptadas. Encuentra el canal seguro."
+    ]
+}
