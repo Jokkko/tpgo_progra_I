@@ -15,6 +15,9 @@ def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
 
     for _ in range(altoDelMapa):
         mapa.append([terreno for _ in range(anchoMinimoDelMapa)])
+        
+        
+        
 
 def GenerarObjeto(mapa,objeto,cantidad):
     '''
@@ -134,8 +137,6 @@ def MenuPrincipal(user):
     '''
     Funcion que se encarga de mostrar el menu principal del juego
     '''
-    #muestre las opciones del menu
-    #se puede usar center aca
     print()
     print(f"{user} Bienvenido a UadEscape")
     print("1. Comenzar Juego")
@@ -289,46 +290,14 @@ def MostrarIntroduccionALaTematica(tematica):
         print("Por favor, ingresá una opción válida.")
 
 def InicializarPistas():
-    '''
-    Funcion que se encarga de incializar las distintas pistas para que el usuario pueda utilizarlas en el juego. Devuelve las pistas disponibles
-    y las usadas
-    '''
-    pistas = {
-        "Breaking Bad": [
-            "Busca en el laboratorio un objeto que brilla en la oscuridad.",
-            "El equipo de protección personal es clave para el éxito. Revisa las cajas.",
-            "Las fórmulas están escondidas en los documentos; no olvides mirar en las carpetas.",
-            "La química puede ser peligrosa. Estudia los frascos con atención."
-        ],
-        "Muerte Anunciada": [
-            "Revisa la habitación donde se celebró la fiesta, hay más de lo que parece.",
-            "Algunos invitados saben más de lo que dicen. Escucha con atención.",
-            "Los periódicos antiguos pueden contener pistas sobre el asesinato.",
-            "Un objeto olvidado podría ser la clave para resolver el misterio."
-        ],
-        "Psiquiátrico": [
-            "Las habitaciones son un laberinto; sigue las marcas en la pared.",
-            "El diario del último paciente podría revelarte información crucial.",
-            "Revisa los cuadros; algunos pueden esconder secretos oscuros."
-        ],
-        "La Casa de Papel": [
-            "El plano del banco tiene detalles que podrían ser útiles. No lo ignores.",
-            "Cada miembro del equipo tiene una habilidad única; úsalas a tu favor.",
-            "Hay cámaras en todo el lugar; busca la manera de desactivarlas."
-        ],
-        "Sherlock Holmes": [
-            "La carta en la mesa contiene un mensaje cifrado; decodifícalo.",
-            "No todos los sospechosos son lo que parecen; investiga sus coartadas."
-        ],
-        "Misión Gubernamental": [
-            "Un dispositivo escondido puede cambiar el curso de la misión; búscalo.",
-            "Las comunicaciones pueden estar interceptadas. Encuentra el canal seguro."
-        ]
-    }
-
+   try:
+    with open("pistas.json", "r") as archivo:
+        pistas = json.load(archivo)
     pistas_usadas = {key: [] for key in pistas.keys()}
-    
     return pistas, pistas_usadas
+   except FileNotFoundError:
+       print("No se encuentra el archivo de las pistas")
+       return {}
 
 def MostrarPista(tematica, pistas, pistas_usadas):
     '''
@@ -363,6 +332,13 @@ def MostrarDesafio(tematica, desafios, desafios_usados):
                 opcion = PedirOpcion(1,3)
                 if(int(desafio[0])==opcion):
                     Fallo = False
+                    print()
+                    print("----- Bien, completaste el desafio -----")
+                    print()
+                else:
+                    print()
+                    print("----- Dale otra vuelta de tuerca, esa no es. -----")
+                    print()
 
             desafios_usados[tematica].append(desafios)
         else:
@@ -375,42 +351,14 @@ def InicializarDesafios():
     Funcion que se encarga de incializar los distintos desafios para que el usuario pueda utilizarlos en el juego.
     Devuelve los desafios disponibles y los jugados
     '''
-    desafios = {
-        "Breaking Bad": [
-            "2|Entras en el laboratorio y en la oscuridad comienzas a mirar tu alrededor ¿Que haces?\n1.Prender la luz\t\t2.Mirar a tu alrededor\t\t3.Gritar",
-            "2|Encuentras unas cajas que puedes abrir, al revisarlas encuentras distintos objetos, ¿Cual agarras?\n1.Libro de cocina\t\t2.Equipo de proteccion personal\t\t3.Efectivo",
-            "3|En el escritorio encontras muchas cosas tiradas, ¿Cual agarras? \n1.Una bolsa con cristales extraños\t\t2.Libros de ciencia\t\t3.Unas carpetas con documentos",
-            "2|En un costado encontras muchas cosas de quimica, ¿Que investigas? \n1.Anotaciones con formulas\t\t2.Unos frascos con liquido brillante\t\t3.Un mechero"
-        ],
-        "Muerte Anunciada": [
-            "2|Estas en una habitacion con 3 puertas, estas dan a otras habitaciones ¿Cual Investigamos? \n1.El baño\t\t2.Una habitacion donde parece que hubo una fiesta\t\t3.Una habitacion antigua",
-            "2|En la habitacion hay mucha gente, ¿Que deseas hacer? \n1.Hablar con ellos\t\t2.Escuchar sus converzaciones\t\t3.Gritarles que hagan silencio",
-            "3|Miras al suelo y visualizas muchas cosas tiradas, ¿Que agarras? \n1.Latas de cerveza vacias\t\t2.Posters antiguos\t\t3.Unos periodicos igual de antiguos",
-            "2|Entras en una habitacion que parece muy antigua y encontras diversos objetos, ¿Con cual te quedas?. \n1.Una pelota de basket\t\t2.Un objeto extraño que parece abandonado\t\t3.Un peluche destrozado"
-        ],
-        "Psiquiátrico": [
-            "3|Estas dentro de una habitacion con muchas puertas ¿Que haces para no perderte?\n1.Entras siempre en la habitacion de la derecha\t\t2.Haces izquierda derecha en bucle\t\t3.Seguis unas marcas en la pared",
-            "1|Encontraste los diarios de los distintos pacientes, ¿Cual agarras?\n1.El del ultimo paciente\t\t2.Uno aleatorio\t\t3.El diario del primer paciente",
-            "1|Miras la pared y observas algunas cosas en la pared, ¿Alguna hara algo? \n1.Mover los cuadros\t\t2.Mirar por la ventana\t\t3.Intentar romper la ventana"
-        ],
-        "La Casa de Papel": [
-            "3|Tenemos que encontrar una forma de escapar y tenemos solo 3 objetos, ¿Que podriamos usar para escapar?\n1.Fuerza Bruta \t\t2.Usar a los rehenes \t\t3.El plano del banco",
-            "1|Hay unas rejas adelante sin embargo parecen debiles, ¿Como podriamos romperlas?\n1.Pedirle a Helsinki que las rompa\t\t2.Dispararles \t\t3.Darles una patada ",
-            "1|El pasillo esta lleno de guardias, ¿Que hacemos?\n1.Entrar en la sala de camaras \t\t2.Seguir por el pasillo con sigilo \t\t3.Quedarse escondido"
-        ],
-        "Sherlock Holmes": [
-            "3|Hay una carta con un mensaje, dice '\n murcielago\n 0123456789\n y abajo pone este texto b9t9n 70724669' ¿Que boton presionamos?\n1.El boton Turquesa \t\t2.El boton Celeste \t\t3.El boton Amarillo",
-            "3|El primer sospechoso dijo que estaba en su casa. Sin embargo, no me convence ¿Que deberia hacer?\n1.Creerle \t\t2.Obligarle a decir la verdad \t\t3.Investigar a fondo "
-        ],
-        "Misión Gubernamental": [
-            "3|Te encuentras en la habitacion, y ves un escritorio, te parece un buen comienzo ¿Que haces?\n1.Revisas los cajones \t\t2.Abres las puertas del escritorio \t\t3.Miras por abajo",
-            "3|En esta hoja dice que no hay ningun canal seguro, sin embargo algo me dice lo contrario ¿Que canal probamos?\n1.D4NG3R \t\t2.3ST3 N0 \t\t3.S4F3"
-        ]
-    }
-
-    desafios_usados = {key: [] for key in desafios.keys()}
-    
-    return desafios, desafios_usados
+    try:
+        with open("desafios.json","r") as archivo:
+            desafios = json.load(archivo)
+        desafios_usados = {key: [] for key in desafios.keys()}
+        return desafios, desafios_usados
+    except FileNotFoundError:
+        print("No se encontro el archivo de los desafios")
+        return {}
 
 def ModificarPuntos(puntos, accion):
     '''
@@ -433,11 +381,17 @@ def MapaParaTematica(tematica):
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = GenerarMapa(4,5,4,6) 
+        probabilidadFin = random.randint(40,100) # 83,3 %
+        habitacionesMax = 2
     elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
         mapa = GenerarMapa(7,8,5,7)
+        probabilidadFin = random.randint(-20,100) # 41,6 %
+        habitacionesMax = 3
     elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
         mapa = GenerarMapa(9,10,5,8)
-    return mapa
+        probabilidadFin = random.randint(-100,100) # 25 %
+        habitacionesMax = 4
+    return mapa, probabilidadFin, habitacionesMax
 
 def ContieneElementos(lista1, lista2):
     ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
@@ -448,21 +402,26 @@ def ContieneElementos(lista1, lista2):
             return True
     return False
 
-def ComenzarJuego(tematica):
+def ComenzarJuego(tematica,puntos = 0,nroHabitacion = 1):
     '''
     Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
     '''
-    puntos = 1000
+    puntos = 1000 + puntos
     Escapo = False
     pistas, pistas_usadas = InicializarPistas()
     desafios, desafios_usadas =InicializarDesafios()
-    mapa = MapaParaTematica(tematica)
+    mapa,probabilidadFin,habitacionesMax = MapaParaTematica(tematica)
+    if (probabilidadFin > 50 or nroHabitacion == habitacionesMax):
+        habitacionFinal = True
+    else:
+        habitacionFinal = False 
     objetos = ["#","$"]
     for i in objetos:
         if(i=="#"):
             indicesPistas = GetIndiceObjeto(mapa,i) 
         else:
             indicesCandados = GetIndiceObjeto(mapa,i)
+            cantCandandos = len(indicesCandados)//2
     
     while not Escapo:
         posicion_actual = GetIndiceObjeto(mapa,"O")
@@ -476,23 +435,38 @@ def ComenzarJuego(tematica):
             print("----PISTA ENCONTRADA----")
             MostrarPista(tematica, pistas, pistas_usadas)
             puntos = ModificarPuntos(puntos, "usar_pista")
+            indicesPistas.remove(posicion_actual[0])
+            indicesPistas.remove(posicion_actual[1])
         elif(ContieneElementos(posicion_actual, indicesCandados)):
             MostrarDesafio(tematica, desafios, desafios_usadas)
+            cantCandandos -= 1
             puntos = ModificarPuntos(puntos, "completar_desafio")
-        RenderizarMapa(mapa)
-        accion = LeerAccion()
-        print(vaciarConsola)
-        if accion == "menu":
-            print("Saliendo al menu principal...")
-            Escapo = True
-            puntos = 0
-        elif ValidarMovimiento(mapa, posicion_actual, accion):   
-            AccionPersonaje(mapa,accion)
-            puntos = ModificarPuntos(puntos,accion)
-            print(f"Puntos actuales: {puntos}")
-        else:
-            print("Movimiento inválido: fuera de los límites del mapa.")
-    return puntos
+            indicesCandados.remove(posicion_actual[0])
+            indicesCandados.remove(posicion_actual[1])
+            if(cantCandandos == 0):
+                if(habitacionFinal == True):
+                    print("------ Felicitaciones, lograste escapar.... Por ahora.... ------")
+                    Escapo = True
+                else:
+                    print("------ Entrando en la siguiente habitacion.... ------")
+                    puntos, Escapo = ComenzarJuego(tematica,puntos,nroHabitacion+1)
+
+        if (not Escapo):        
+            RenderizarMapa(mapa)
+            accion = LeerAccion()
+            print(vaciarConsola)
+            if accion == "menu":
+                print("Saliendo al menu principal...")
+                Escapo = True
+                puntos = 0
+            elif ValidarMovimiento(mapa, posicion_actual, accion):   
+                AccionPersonaje(mapa,accion)
+                puntos = ModificarPuntos(puntos,accion)
+                print(f"Puntos actuales: {puntos}")
+            else:
+                print("Movimiento inválido: fuera de los límites del mapa.")
+        
+    return puntos, Escapo
 
 def Instrucciones():
     '''
@@ -523,19 +497,19 @@ def registrarPuntos(user,puntos):
         print("Error, no se encontro el archivo")
 
 
-def FirstsLastsRanking(users,firsts):
-    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"],reverse=firsts))
-    if(firsts):
+def PrimerosUltimosRanking(usuarios,primeros):
+    usuariosOrdenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
+    if(primeros):
         x=1
     else:
-        x=len(usersOrdered)
+        x=len(usuariosOrdenados)
     
-    rank = usersOrdered[:10]
+    rank = usuariosOrdenados[:10]
     
     print(f"\tPuesto\t - \tNombre\t - \tPuntuacion Máxima")
     for users in rank:
-        print(f"\t{x}\t - \t{users['Username']}\t - \t{users['Puntos']}")
-        if(firsts):
+        print(f"\t{x}\t - \t{users['Username']}\t - \t{usuarios['Puntos']}")
+        if(primeros):
             x+=1
         else:
             x-=1
@@ -549,17 +523,6 @@ def RankingJugador(users,username = None):
         print(f"{jugador[0]['Username']} tiene {jugador[0]['Puntos']} de puntuacion maxima.")
     except:
         print("El jugador no existe")
-
-'''
-def Last10Ranking(users):
-    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"]))
-    x=len(usersOrdered)
-    last10 = usersOrdered[:10]
-    print(f"# - Nombre - Puntuacion Máxima")
-    for users in last10:
-        print(f"{x} - {users['Username']} - {users['Puntos']}")
-        x-=1
-'''
 
 def Ranking(user):
     try:
@@ -583,11 +546,11 @@ def Ranking(user):
         print()
 
         if(opcion == 1):
-            FirstsLastsRanking(RankList,True)
+            PrimerosUltimosRanking(RankList,True)
         elif (opcion == 2):
             RankingJugador(RankList)
         elif (opcion == 3):
-            FirstsLastsRanking(RankList,False)
+            PrimerosUltimosRanking(RankList,False)
         elif (opcion == 4):
             RankingJugador(RankList,user)
         elif (opcion == 5):
@@ -609,8 +572,8 @@ def main():
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
             tematica = ElegirTematica()
-            puntos = ComenzarJuego(tematica)
-            if puntos > 0:
+            puntos, escapo = ComenzarJuego(tematica)
+            if puntos > 0 and escapo:
                 print("Felicidades, escapaste")
                 registrarPuntos(user,puntos)
             else:
