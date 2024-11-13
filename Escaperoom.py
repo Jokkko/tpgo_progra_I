@@ -15,6 +15,9 @@ def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
 
     for _ in range(altoDelMapa):
         mapa.append([terreno for _ in range(anchoMinimoDelMapa)])
+        
+        
+        
 
 def GenerarObjeto(mapa,objeto,cantidad):
     '''
@@ -134,8 +137,6 @@ def MenuPrincipal(user):
     '''
     Funcion que se encarga de mostrar el menu principal del juego
     '''
-    #muestre las opciones del menu
-    #se puede usar center aca
     print()
     print(f"{user} Bienvenido a UadEscape")
     print("1. Comenzar Juego")
@@ -380,6 +381,13 @@ def MostrarDesafio(tematica, desafios, desafios_usados):
                 opcion = PedirOpcion(1,3)
                 if(int(desafio[0])==opcion):
                     Fallo = False
+                    print()
+                    print("----- Bien, completaste el desafio -----")
+                    print()
+                else:
+                    print()
+                    print("----- Dale otra vuelta de tuerca, esa no es. -----")
+                    print()
 
             desafios_usados[tematica].append(desafios)
         else:
@@ -422,11 +430,17 @@ def MapaParaTematica(tematica):
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = GenerarMapa(4,5,4,6) 
+        probabilidadFin = random.randint(40,100) # 83,3 %
+        habitacionesMax = 2
     elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
         mapa = GenerarMapa(7,8,5,7)
+        probabilidadFin = random.randint(-20,100) # 41,6 %
+        habitacionesMax = 3
     elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
         mapa = GenerarMapa(9,10,5,8)
-    return mapa
+        probabilidadFin = random.randint(-100,100) # 25 %
+        habitacionesMax = 4
+    return mapa, probabilidadFin, habitacionesMax
 
 def ContieneElementos(lista1, lista2):
     ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
@@ -437,21 +451,26 @@ def ContieneElementos(lista1, lista2):
             return True
     return False
 
-def ComenzarJuego(tematica):
+def ComenzarJuego(tematica,puntos = 0,nroHabitacion = 1):
     '''
     Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
     '''
-    puntos = 1000
+    puntos = 1000 + puntos
     Escapo = False
     pistas, pistas_usadas = InicializarPistas()
     desafios, desafios_usadas =InicializarDesafios()
-    mapa = MapaParaTematica(tematica)
+    mapa,probabilidadFin,habitacionesMax = MapaParaTematica(tematica)
+    if (probabilidadFin > 50 or nroHabitacion == habitacionesMax):
+        habitacionFinal = True
+    else:
+        habitacionFinal = False 
     objetos = ["#","$"]
     for i in objetos:
         if(i=="#"):
             indicesPistas = GetIndiceObjeto(mapa,i) 
         else:
             indicesCandados = GetIndiceObjeto(mapa,i)
+            cantCandandos = len(indicesCandados)//2
     
     while not Escapo:
         posicion_actual = GetIndiceObjeto(mapa,"O")
@@ -465,23 +484,38 @@ def ComenzarJuego(tematica):
             print("----PISTA ENCONTRADA----")
             MostrarPista(tematica, pistas, pistas_usadas)
             puntos = ModificarPuntos(puntos, "usar_pista")
+            indicesPistas.remove(posicion_actual[0])
+            indicesPistas.remove(posicion_actual[1])
         elif(ContieneElementos(posicion_actual, indicesCandados)):
             MostrarDesafio(tematica, desafios, desafios_usadas)
+            cantCandandos -= 1
             puntos = ModificarPuntos(puntos, "completar_desafio")
-        RenderizarMapa(mapa)
-        accion = LeerAccion()
-        print(vaciarConsola)
-        if accion == "menu":
-            print("Saliendo al menu principal...")
-            Escapo = True
-            puntos = 0
-        elif ValidarMovimiento(mapa, posicion_actual, accion):   
-            AccionPersonaje(mapa,accion)
-            puntos = ModificarPuntos(puntos,accion)
-            print(f"Puntos actuales: {puntos}")
-        else:
-            print("Movimiento inválido: fuera de los límites del mapa.")
-    return puntos
+            indicesCandados.remove(posicion_actual[0])
+            indicesCandados.remove(posicion_actual[1])
+            if(cantCandandos == 0):
+                if(habitacionFinal == True):
+                    print("------ Felicitaciones, lograste escapar.... Por ahora.... ------")
+                    Escapo = True
+                else:
+                    print("------ Entrando en la siguiente habitacion.... ------")
+                    puntos, Escapo = ComenzarJuego(tematica,puntos,nroHabitacion+1)
+
+        if (not Escapo):        
+            RenderizarMapa(mapa)
+            accion = LeerAccion()
+            print(vaciarConsola)
+            if accion == "menu":
+                print("Saliendo al menu principal...")
+                Escapo = True
+                puntos = 0
+            elif ValidarMovimiento(mapa, posicion_actual, accion):   
+                AccionPersonaje(mapa,accion)
+                puntos = ModificarPuntos(puntos,accion)
+                print(f"Puntos actuales: {puntos}")
+            else:
+                print("Movimiento inválido: fuera de los límites del mapa.")
+        
+    return puntos, Escapo
 
 def Instrucciones():
     '''
@@ -512,19 +546,19 @@ def registrarPuntos(user,puntos):
         print("Error, no se encontro el archivo")
 
 
-def FirstsLastsRanking(users,firsts):
-    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"],reverse=firsts))
-    if(firsts):
+def PrimerosUltimosRanking(usuarios,primeros):
+    usuariosOrdenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
+    if(primeros):
         x=1
     else:
-        x=len(usersOrdered)
+        x=len(usuariosOrdenados)
     
-    rank = usersOrdered[:10]
+    rank = usuariosOrdenados[:10]
     
     print(f"\tPuesto\t - \tNombre\t - \tPuntuacion Máxima")
     for users in rank:
-        print(f"\t{x}\t - \t{users['Username']}\t - \t{users['Puntos']}")
-        if(firsts):
+        print(f"\t{x}\t - \t{users['Username']}\t - \t{usuarios['Puntos']}")
+        if(primeros):
             x+=1
         else:
             x-=1
@@ -538,17 +572,6 @@ def RankingJugador(users,username = None):
         print(f"{jugador[0]['Username']} tiene {jugador[0]['Puntos']} de puntuacion maxima.")
     except:
         print("El jugador no existe")
-
-'''
-def Last10Ranking(users):
-    usersOrdered = list(sorted(users,key= lambda x: x["Puntos"]))
-    x=len(usersOrdered)
-    last10 = usersOrdered[:10]
-    print(f"# - Nombre - Puntuacion Máxima")
-    for users in last10:
-        print(f"{x} - {users['Username']} - {users['Puntos']}")
-        x-=1
-'''
 
 def Ranking(user):
     try:
@@ -572,11 +595,11 @@ def Ranking(user):
         print()
 
         if(opcion == 1):
-            FirstsLastsRanking(RankList,True)
+            PrimerosUltimosRanking(RankList,True)
         elif (opcion == 2):
             RankingJugador(RankList)
         elif (opcion == 3):
-            FirstsLastsRanking(RankList,False)
+            PrimerosUltimosRanking(RankList,False)
         elif (opcion == 4):
             RankingJugador(RankList,user)
         elif (opcion == 5):
@@ -598,8 +621,8 @@ def main():
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
             tematica = ElegirTematica()
-            puntos = ComenzarJuego(tematica)
-            if puntos > 0:
+            puntos, escapo = ComenzarJuego(tematica)
+            if puntos > 0 and escapo:
                 print("Felicidades, escapaste")
                 registrarPuntos(user,puntos)
             else:
