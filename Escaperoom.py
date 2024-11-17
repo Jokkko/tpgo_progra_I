@@ -631,7 +631,7 @@ def main():
             else:
                 print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
-            Ranking(user)
+            ranking(user)
         elif (opcion == 3):
             Instrucciones()
         elif (opcion == 4):
