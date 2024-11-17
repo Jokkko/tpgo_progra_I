@@ -216,18 +216,25 @@ def generar_id(user_repository):
         id = user_repository[ultimo]['id'] + 1
     return id
 
-def pedir_opcion(min,max):
+def pedir_opcion(min, max):
     '''
-    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
+    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo,
+    valida que sea un número y que esté dentro del rango, luego devuelve la opcion elegida
     '''
-    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    while opcion < min or opcion > max:
-        print("Error, la opción ingresada no es válida.")
-        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    print()
-    return opcion
+    while True:
+        try:
+            opcion = input(f"Elija una opcion entre {min} y {max}: ")
+            opcion = int(opcion)
+            
+            if opcion < min or opcion > max:
+                print("Error, la opción debe estar entre los valores indicados.")
+                continue
+            
+            print()
+            return opcion
+            
+        except ValueError:
+            print("Error, debe ingresar un número válido.")
 
 def mostrar_dificultades():
     '''
