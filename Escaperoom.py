@@ -267,6 +267,10 @@ def elegir_tematica():
     return dificultad[seleccion - 1]
 
 def cargar_introducciones():
+    '''
+    Carga las introducciones desde el archivo JSON ubicado en la carpeta Data.
+    Si el archivo no existe o contiene un JSON inválido, retorna una lista vacía.
+    '''
     try:
         ruta_archivo_instrucciones = os.path.join(os.getcwd(), "Data", "introducciones.json")
         with open(ruta_archivo_instrucciones, "r") as introducciones_archivo:
@@ -376,13 +380,22 @@ def inicializar_desafios():
     Devuelve los desafios disponibles y los jugados
     '''
     try:
-        with open("desafios.json","r") as archivo:
-            desafios = json.load(archivo)
+        ruta_archivo_desafios = os.path.join(os.getcwd(), "Data", "desafios.json")
+        with open(ruta_archivo_desafios,"r") as archivo_desafíos:
+            desafios = json.load(archivo_desafíos)
         desafios_usados = {key: [] for key in desafios.keys()}
         return desafios, desafios_usados
     except FileNotFoundError:
-        print("No se encontro el archivo de los desafios")
-        return {}
+        print("Error: No se encontró el archivo de los desafíos.")
+        return {}, {}
+
+    except json.JSONDecodeError:
+        print("Error: El archivo de desafíos tiene un formato inválido.")
+        return {}, {}
+
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {}, {}
 
 def modificar_puntos(puntos, accion):
     '''
