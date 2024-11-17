@@ -1,6 +1,7 @@
 import random
 import re
 import json
+import os
 
 terreno = " "
 vaciarConsola = "\n" * 50
@@ -16,9 +17,6 @@ def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
     for _ in range(altoDelMapa):
         mapa.append([terreno for _ in range(anchoMinimoDelMapa)])
         
-        
-        
-
 def GenerarObjeto(mapa,objeto,cantidad):
     '''
     Recibe un mapa (matriz), un objeto (caracter string) cantidad (int) Y genera en x posiciones aleatoria del mapa el objeto pasado por parametro
@@ -171,26 +169,36 @@ def PedirUserNames():
 
 def GenerarUser(username):
     '''
-    Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
+    Función que genera el registro del usuario nuevo, generando un ID y asociándole el nombre de usuario.
     '''
     try:
-        with open("userRepository.json","r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-        userRepository = list(userRepository)
+        ruta_archivo_user = os.path.join(os.getcwd(), "Data", "userRepository.json")
+        try:
+            with open(ruta_archivo_user, "r") as userRepositoryArchivo:
+                user_repository = json.load(userRepositoryArchivo)
+        except (FileNotFoundError, json.JSONDecodeError):
+            user_repository = []
 
-        while any(user['Username'] == username for user in userRepository):
-            print(f"El nombre de usuario ya está en uso. Intente con otro.")
-            username= PedirUserName()
+        while any(user['Username'] == username for user in user_repository):
+            print(f"El nombre de usuario '{username}' ya está en uso. Intente con otro.")
+            username = PedirUserName()
         
-        with open("userRepository.json","w") as userRepositoryArchivo:
-            userRepository.append(dict(Username=username,Id = GenerarId(userRepository),Puntos = 0 ))
-            json.dump(userRepository,userRepositoryArchivo)
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        nuevo_usuario = {
+            "Username": username,
+            "Id": GenerarId(user_repository),
+            "Puntos": 0
+        }
+        user_repository.append(nuevo_usuario)
 
-        
+        with open(ruta_archivo_user, "w") as archivo:
+            json.dump(user_repository, archivo, indent=4)
+
+        print(f"Usuario '{username}' registrado con éxito.")
+
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error de archivo: {e}")
+    except Exception as e:
+        print(f"Error inesperado: {e}")
 
 
 def GenerarId(userRepository):
@@ -261,13 +269,23 @@ def ElegirTematica():
     return dificultad[seleccion - 1]
 
 def cargar_introducciones():
+    '''
+    Carga las introducciones desde el archivo JSON ubicado en la carpeta Data.
+    Si el archivo no existe o contiene un JSON inválido, retorna una lista vacía.
+    '''
     try:
-        with open("introducciones.json","r") as archivo:
-            introducciones = json.load(archivo)
-        return introducciones
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo de las introducciones")
-        return {}
+        ruta_archivo_instrucciones = os.path.join(os.getcwd(), "Data", "introducciones.json")
+        with open(ruta_archivo_instrucciones, "r") as introduccionesArchivo:
+            introducciones = json.load(introduccionesArchivo)
+            return introducciones
+        
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No se encontró el archivo o el contenido es inválido.")
+        return []
+
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return []
 
 def MostrarIntroduccionALaTematica(tematica):   
     '''
@@ -290,14 +308,26 @@ def MostrarIntroduccionALaTematica(tematica):
         print("Por favor, ingresá una opción válida.")
 
 def InicializarPistas():
-   try:
-    with open("pistas.json", "r") as archivo:
-        pistas = json.load(archivo)
-    pistas_usadas = {key: [] for key in pistas.keys()}
-    return pistas, pistas_usadas
-   except FileNotFoundError:
-       print("No se encuentra el archivo de las pistas")
-       return {}
+    '''
+    Carga las pistas desde un archivo JSON ubicado en la carpeta Data.
+    Si el archivo no existe, retorna un diccionario vacío.
+    '''
+    try:
+        ruta_archivo_pistas = os.path.join(os.getcwd(), "Data", "pistas.json")
+        with open(ruta_archivo_pistas, "r") as pistas_archivo:
+            pistas = json.load(pistas_archivo)
+        pistas_usadas = {key: [] for key in pistas.keys()}
+        return pistas, pistas_usadas
+
+    except FileNotFoundError:
+        print("Error: No se encuentra el archivo de las pistas.")
+        return {}, {}
+    except json.JSONDecodeError:
+        print("Error: El archivo de pistas tiene un formato inválido.")
+        return {}, {}
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {}, {}
 
 def MostrarPista(tematica, pistas, pistas_usadas):
     '''
@@ -352,13 +382,22 @@ def InicializarDesafios():
     Devuelve los desafios disponibles y los jugados
     '''
     try:
-        with open("desafios.json","r") as archivo:
-            desafios = json.load(archivo)
+        ruta_archivo_desafios = os.path.join(os.getcwd(), "Data", "desafios.json")
+        with open(ruta_archivo_desafios,"r") as archivo_desafíos:
+            desafios = json.load(archivo_desafíos)
         desafios_usados = {key: [] for key in desafios.keys()}
         return desafios, desafios_usados
     except FileNotFoundError:
-        print("No se encontro el archivo de los desafios")
-        return {}
+        print("Error: No se encontró el archivo de los desafíos.")
+        return {}, {}
+
+    except json.JSONDecodeError:
+        print("Error: El archivo de desafíos tiene un formato inválido.")
+        return {}, {}
+
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {}, {}
 
 def ModificarPuntos(puntos, accion):
     '''
@@ -478,24 +517,33 @@ def Instrucciones():
     print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
     print("Buena suerte, la vas a necesitar.")
 
-def registrarPuntos(user,puntos):
+def registrarPuntos(user, puntos):
+    '''
+    Actualiza los puntos de un usuario en el archivo 'userRepository.json' si el nuevo puntaje es mayor al existente.
+    '''
     try:
-        with open("userRepository.json",mode="r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-        
-        jugador = list(filter(lambda x: x['Username']==user,userRepository))
-        if(puntos > jugador[0]["Puntos"]):
-            for users in userRepository:
-                if(users['Id'] == jugador[0]['Id'] ):
-                    users['Puntos'] = puntos
-            
-            with open("userRepository.json","w") as userRepositoryArchivo:
-                json.dump(userRepository,userRepositoryArchivo)
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        ruta_archivo_puntos = os.path.join(os.getcwd(), "Data", "userRepository.json")
+        with open(ruta_archivo_puntos, mode="r") as user_repository_archivo:
+            user_repository = json.load(user_repository_archivo)
 
+        jugador = next((u for u in user_repository if u['Username'] == user), None)
+        if jugador:
+            if puntos > jugador["Puntos"]:
+                jugador["Puntos"] = puntos
+                with open(ruta_archivo_puntos, "w") as user_repository_archivo:
+                    json.dump(user_repository, user_repository_archivo, indent=4)
+                print(f"Puntos actualizados para el usuario '{user}': {puntos}")
+            else:
+                print(f"El usuario '{user}' ya tiene un puntaje mayor o igual: {jugador['Puntos']}")
+        else:
+            print(f"Error: El usuario '{user}' no existe en el repositorio.")
+
+    except FileNotFoundError:
+        print("Error: No se encontró el archivo 'userRepository.json'.")
+    except json.JSONDecodeError:
+        print("Error: El archivo 'userRepository.json' tiene un formato inválido.")
+    except Exception as e:
+        print(f"Error inesperado: {e}")
 
 def PrimerosUltimosRanking(usuarios,primeros):
     usuariosOrdenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
@@ -524,15 +572,19 @@ def RankingJugador(users,username = None):
     except:
         print("El jugador no existe")
 
-def Ranking(user):
+def ranking(user):
+    """
+    Muestra el ranking con las opciones para ver las mejores/peores puntuaciones,
+    buscar un jugador, y ver la mejor puntuación del usuario.
+    """
     try:
-        with open("userRepository.json",mode="r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-            RankList = [user for user in list(userRepository)]
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        ruta_archivo_ranking = os.path.join(os.getcwd(), "Data", "userRepository.json")
+        with open(ruta_archivo_ranking, mode="r") as user_repository_archivo:
+            userRepository = json.load(user_repository_archivo)
+            rank_list = userRepository
+    except (IOError, FileNotFoundError):
+        print("Error al abrir o encontrar el archivo 'userRepository.json'.")
+        return
     
     opcion = 0
     while(opcion != 5):
@@ -546,13 +598,13 @@ def Ranking(user):
         print()
 
         if(opcion == 1):
-            PrimerosUltimosRanking(RankList,True)
+            PrimerosUltimosRanking(rank_list,True)
         elif (opcion == 2):
-            RankingJugador(RankList)
+            RankingJugador(rank_list)
         elif (opcion == 3):
-            PrimerosUltimosRanking(RankList,False)
+            PrimerosUltimosRanking(rank_list,False)
         elif (opcion == 4):
-            RankingJugador(RankList,user)
+            RankingJugador(rank_list,user)
         elif (opcion == 5):
             print("Saliendo...")
         else:
