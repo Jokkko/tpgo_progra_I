@@ -4,6 +4,7 @@ import json
 import os
 
 terreno = " "
+vaciar_consola = "\n" * 50
 
 def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     '''
@@ -11,10 +12,10 @@ def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
     '''
     alto_del_mapa = random.randint(altura_min,altura_max)
-    ancho_del_mapa = random.randint(ancho_min,ancho_max) 
+    ancho_minimo_del_mapa = random.randint(ancho_min,ancho_max) 
 
     for _ in range(alto_del_mapa):
-        mapa.append([terreno for _ in range(ancho_del_mapa)])
+        mapa.append([terreno for _ in range(ancho_minimo_del_mapa)])
         
 def generar_objeto(mapa,objeto,cantidad):
     '''
@@ -45,6 +46,7 @@ def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
             generar_objeto(mapa,i,1)
         else:
             generar_objeto(mapa,i,2) 
+        
     return mapa
 
 def renderizar_mapa(mapa):
@@ -145,7 +147,7 @@ def pedir_user_name(jugador_numero=0):
     devuelve el nombre de usuario validado 
     '''
     patron = r"^[a-zA-Z]{3,9}$"
-    bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido Jugador {jugador_numero}") 
+    bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido jugador {jugador_numero}") 
     bienvenida(jugador_numero)
     username = input(f"Jugador, ingrese un nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
     nombre_valido = re.match(patron, username)
@@ -159,9 +161,9 @@ def pedir_user_name(jugador_numero=0):
 
 def pedir_user_names():
     '''Funcion auxiliar que  se encarga de pedir y generar dos usernames, para dos jugadores, los devuelve'''
-    username1 = pedir_user_name(1)
-    username2 = pedir_user_name(2)
-    return username1, username2
+    user_name1 = pedir_user_name(1)
+    user_name2 = pedir_user_name(2)
+    return user_name1, user_name2
 
 def generar_user(username):
     '''
@@ -204,7 +206,7 @@ def generar_id(user_repository):
     id = 0
     if(len(user_repository) != 0):
         ultimo = len(user_repository)-1 
-        id = user_repository[ultimo]['Id'] + 1
+        id = user_repository[ultimo]['id'] + 1
     return id
 
 def pedir_opcion(min,max):
@@ -321,7 +323,7 @@ def inicializar_pistas():
         print(f"Error inesperado: {e}")
         return {}, {}
 
-def mostrar_pista(tematica, pistas, pistas_usadas):
+def mostrar_pistas(tematica, pistas, pistas_usadas):
     '''
     Funcion que recibe una tematica, pistas para la misma, y las pistas que fueron usadas, se encarga de mostrar una pista aleatoria de las disopnibles
     '''
@@ -431,8 +433,8 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
     puntos = 1000 + puntos
     escapo = False
     pistas, pistas_usadas = inicializar_pistas()
-    desafios, desafios_usadas =inicializar_desafios()
-    mapa,probabilidad_fin,habitaciones_max = mapa_para_tematica(tematica)
+    desafios, desafios_usadas = inicializar_desafios()
+    mapa, probabilidad_fin, habitaciones_max = mapa_para_tematica(tematica)
     if (probabilidad_fin > 50 or nro_habitacion == habitaciones_max):
         habitacion_final = True
     else:
@@ -455,7 +457,7 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
         
         if(contiene_elementos(posicion_actual, indices_pistas)): 
             print("----PISTA ENCONTRADA----")
-            mostrar_pista(tematica, pistas, pistas_usadas)
+            mostrar_pistas(tematica, pistas, pistas_usadas)
             puntos = modificar_puntos(puntos, "usar_pista")
             indices_pistas.remove(posicion_actual[0])
             indices_pistas.remove(posicion_actual[1])
@@ -476,7 +478,7 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
         if (not escapo):        
             renderizar_mapa(mapa)
             accion = leer_accion()
-            os.system('clear') 
+            print(vaciar_consola)
             if accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
@@ -529,8 +531,8 @@ def registrar_puntos(user, puntos):
     except Exception as e:
         print(f"Error inesperado: {e}")
 
-def primeros_ultimos_ranking(usuarios,primeros):
-    usuarios_ordenados = list(sorted(usuarios,key= lambda x: x["puntos"],reverse=primeros))
+def primeros_ultimos_anking(usuarios,primeros):
+    usuarios_ordenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
     if(primeros):
         x=1
     else:
@@ -579,11 +581,11 @@ def ranking(user):
         print()
 
         if(opcion == 1):
-            primeros_ultimos_ranking(rank_list,True)
+            primeros_ultimos_anking(rank_list,True)
         elif (opcion == 2):
             ranking_jugador(rank_list)
         elif (opcion == 3):
-            primeros_ultimos_ranking(rank_list,False)
+            primeros_ultimos_anking(rank_list,False)
         elif (opcion == 4):
             ranking_jugador(rank_list,user)
         elif (opcion == 5):
@@ -601,7 +603,6 @@ def main():
     jugando = True
     tematica = 0
     while(jugando):
-        os.system('clear') 
         menu_principal(user)
         opcion = pedir_opcion(1,4)
         if(opcion == 1):
