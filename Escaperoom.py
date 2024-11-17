@@ -4,74 +4,69 @@ import json
 import os
 
 terreno = " "
-vaciarConsola = "\n" * 50
 
-def GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax):
+def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     '''
     Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por una variable global
     el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
     '''
-    altoDelMapa = random.randint(alturaMin,alturaMax)
-    anchoMinimoDelMapa = random.randint(anchoMin,anchoMax) 
+    alto_del_mapa = random.randint(altura_min,altura_max)
+    ancho_del_mapa = random.randint(ancho_min,ancho_max) 
 
-    for _ in range(altoDelMapa):
-        mapa.append([terreno for _ in range(anchoMinimoDelMapa)])
+    for _ in range(alto_del_mapa):
+        mapa.append([terreno for _ in range(ancho_del_mapa)])
         
-        
-        
-
-def GenerarObjeto(mapa,objeto,cantidad):
+def generar_objeto(mapa,objeto,cantidad):
     '''
     Recibe un mapa (matriz), un objeto (caracter string) cantidad (int) Y genera en x posiciones aleatoria del mapa el objeto pasado por parametro
     x es definida por cantidad
     '''
-    columnaSpawn = random.randint(0,len(mapa)-1) 
-    filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
+    columna_spawn = random.randint(0,len(mapa)-1) 
+    fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
     for _ in range(cantidad):
-        while(mapa[columnaSpawn][filaSpawn] != terreno): 
-            columnaSpawn = random.randint(0,len(mapa)-1) 
-            filaSpawn = random.randint(0,len(mapa[columnaSpawn])-1)
-        mapa[columnaSpawn][filaSpawn] = objeto
+        while(mapa[columna_spawn][fila_spawn] != terreno): 
+            columna_spawn = random.randint(0,len(mapa)-1) 
+            fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
+        mapa[columna_spawn][fila_spawn] = objeto
 
-def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
+def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
     '''
     Genera un mapa de juego con una altura y un ancho, minimo y maximo
     Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
     '''
     mapa = []
-    #terreno = " "
     personaje = "O"
     candados = "$"
     pistas = "#"
     objetos = [personaje,candados,pistas]
-    GenerarTerreno(mapa,alturaMin,alturaMax,anchoMin,anchoMax)
+    generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max)
     for i in objetos:
         if(i == personaje):
-            GenerarObjeto(mapa,i,1)
+            generar_objeto(mapa,i,1)
         else:
-            GenerarObjeto(mapa,i,2) 
+            generar_objeto(mapa,i,2) 
     return mapa
 
-def RenderizarMapa(mapa):
+def renderizar_mapa(mapa):
     '''
     Muestra la salida por consola de una mapa (matriz) recibido por parametro
     '''
     for fila in mapa:
         print(fila)
 
-def LeerAccion():
+def leer_accion():
     '''
     Lee de la entrada un string ingresado por el usuario, verifica que este dentro de las acciones validas ('w', 'a', 's', 'd','menu')
     y devuelve la accion validada
     '''
-    accionesValidas = {'w', 'a', 's', 'd','menu'}
+    acciones_validas = {'w', 'a', 's', 'd','menu'}
     accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
-    while accion not in accionesValidas:
+    while accion not in acciones_validas:
         print("Acción no válida. Intentálo de nuevo.")
         accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
     return accion
 
-def ValidarMovimiento(mapa, posicion_actual, accion):
+def validar_movimiento(mapa, posicion_actual, accion):
     '''
     Recibe por parametro un mapa (matriz) una posicion_actual (lista) que hacen referencia a los ejes x y de una matriz, y recibe una accion
     'w', 'a', 's', 'd' verifica que la matriz desde la posicion_actual tenga espacio para moverse en cada eje segun w a s d
@@ -94,7 +89,7 @@ def ValidarMovimiento(mapa, posicion_actual, accion):
         return False
     return True
 
-def GetIndiceObjeto(mapa,objeto):
+def get_indice_objeto(mapa,objeto):
     '''
     Recibe por parametro un mapa y un objeto, se encarga de guardar todos los pares [x y] donde ese objeto se encuentre en la matriz y los devuelve
     en una lista 
@@ -107,33 +102,32 @@ def GetIndiceObjeto(mapa,objeto):
                 indices.append(x)
     return indices
 
-def MoverObjeto(mapa,x,y,objeto):
+def mover_objeto(mapa,x,y,objeto):
     '''
     Mueve a un objeto recibido por parametro dentro de la matriz mapa tambien recibida por parametro, tantas veces en x como diga el parametro
     y tantas veces en y como diga el parametro.
     '''
-    #terreno = " "
-    coordenadasObjeto = GetIndiceObjeto(mapa,objeto)
-    mapa[coordenadasObjeto[0]][coordenadasObjeto[1]] = terreno
-    mapa[coordenadasObjeto[0]+y*(-1)][coordenadasObjeto[1]+x] = objeto
+    coordenadas_objeto = get_indice_objeto(mapa,objeto)
+    mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = terreno
+    mapa[coordenadas_objeto[0]+y*(-1)][coordenadas_objeto[1]+x] = objeto
 
-def AccionPersonaje(mapa,accion): 
+def accion_personaje(mapa,accion): 
     '''
-    Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion MoverObjeto, para mover al personaje segun la accion elegida
+    Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion mover_objeto, para mover al personaje segun la accion elegida
     '''
     personaje = "O"
     
     if  (accion == "w"):
-        MoverObjeto(mapa,0,1,personaje)
+        mover_objeto(mapa,0,1,personaje)
     elif(accion == "s"):
-        MoverObjeto(mapa,0,-1,personaje) 
+        mover_objeto(mapa,0,-1,personaje) 
     elif(accion == "a"):
-        MoverObjeto(mapa,-1,0,personaje)
+        mover_objeto(mapa,-1,0,personaje)
     elif(accion == "d"):
-        MoverObjeto(mapa,1,0,personaje)
+        mover_objeto(mapa,1,0,personaje)
 
 
-def MenuPrincipal(user):
+def menu_principal(user):
     '''
     Funcion que se encarga de mostrar el menu principal del juego
     '''
@@ -145,65 +139,75 @@ def MenuPrincipal(user):
     print("4. Salir")
  
 
-def PedirUserName(jugador_numero=0):
+def pedir_user_name(jugador_numero=0):
     '''
     Funcion que recibe por parametro el numero de jugado que va a jugar , pedir al usuario que ingrese el nombre, y generarlo
     devuelve el nombre de usuario validado 
     '''
     patron = r"^[a-zA-Z]{3,9}$"
-    Bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido Jugador {jugador_numero}") 
-    Bienvenida(jugador_numero)
+    bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido Jugador {jugador_numero}") 
+    bienvenida(jugador_numero)
     username = input(f"Jugador, ingrese un nombre de usuario (3-9 caracteres, sin números o caracteres especiales): ")
-    nombreValido = re.match(patron, username)
+    nombre_valido = re.match(patron, username)
 
-    while nombreValido is None:
-        if nombreValido is None:
+    while nombre_valido is None:
+        if nombre_valido is None:
             print(f"Nombre no válido. Inténtelo de nuevo.")
         username = input(f"Jugador, por favor, ingrese un nombre de usuario: ")
-        nombreValido = re.match(patron, username)
+        nombre_valido = re.match(patron, username)
     return username
 
-def PedirUserNames():
+def pedir_user_names():
     '''Funcion auxiliar que  se encarga de pedir y generar dos usernames, para dos jugadores, los devuelve'''
-    username1 = PedirUserName(1)
-    username2 = PedirUserName(2)
+    username1 = pedir_user_name(1)
+    username2 = pedir_user_name(2)
     return username1, username2
 
-def GenerarUser(username):
+def generar_user(username):
     '''
     Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
     '''
     try:
-        with open("userRepository.json","r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-        userRepository = list(userRepository)
+        ruta_archivo_user = os.path.join(os.getcwd(), "Data", "user_repository.json")
+        try:
+            with open(ruta_archivo_user, "r") as user_repository_archivo:
+                user_repository = json.load(user_repository_archivo)
+        except (FileNotFoundError, json.JSONDecodeError):
+            user_repository = []
 
-        while any(user['Username'] == username for user in userRepository):
-            print(f"El nombre de usuario ya está en uso. Intente con otro.")
-            username= PedirUserName()
+        while any(user['username'] == username for user in user_repository):
+            print(f"El nombre de usuario '{username}' ya está en uso. Intente con otro.")
+            username = pedir_user_name()
         
-        with open("userRepository.json","w") as userRepositoryArchivo:
-            userRepository.append(dict(Username=username,Id = GenerarId(userRepository),Puntos = 0 ))
-            json.dump(userRepository,userRepositoryArchivo)
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        nuevo_usuario = {
+            "username": username,
+            "id": generar_id(user_repository),
+            "puntos": 0
+        }
+        user_repository.append(nuevo_usuario)
 
-        
+        with open(ruta_archivo_user, "w") as archivo:
+            json.dump(user_repository, archivo, indent=4)
+
+        print(f"Usuario '{username}' registrado con éxito.")
+
+    except (FileNotFoundError, IOError) as e:
+        print(f"Error de archivo: {e}")
+    except Exception as e:
+        print(f"Error inesperado: {e}")
 
 
-def GenerarId(userRepository):
+def generar_id(user_repository):
     '''
     Funcion que genera un id para un usuario, a partir del ultimo id ingresado
     '''
     id = 0
-    if(len(userRepository) != 0):
-        ultimo = len(userRepository)-1 
-        id = userRepository[ultimo]['Id'] + 1
+    if(len(user_repository) != 0):
+        ultimo = len(user_repository)-1 
+        id = user_repository[ultimo]['Id'] + 1
     return id
 
-def PedirOpcion(min,max):
+def pedir_opcion(min,max):
     '''
     Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
     '''
@@ -216,7 +220,7 @@ def PedirOpcion(min,max):
     print()
     return opcion
 
-def MostrarDificultades():
+def mostrar_dificultades():
     '''
     Funcion que se encarga de mostrar los distintos niveles de dificultad
     '''
@@ -226,12 +230,12 @@ def MostrarDificultades():
     print("3. Dificil")
     
 
-def NivelDeDificultad():
+def nivel_de_dificultad():
     '''
     Funcion que se encarga de pedirle al usuario que ingrese que dificultad quiere elegir y que devuelve las distintas tematicas segun la dificutald
     '''
-    MostrarDificultades()
-    opcion = PedirOpcion(1,3)
+    mostrar_dificultades()
+    opcion = pedir_opcion(1,3)
 
     facil = ["Breaking Bad","Muerte Anunciada"]
     intermedio = ["Psiquiátrico","La Casa de Papel"]
@@ -246,30 +250,36 @@ def NivelDeDificultad():
 
     return dificultad
 
-def ElegirTematica():
+def elegir_tematica():
     '''
     Funcion que se encarga de pedirle a un usuario que ingrese que tematica quiere jugar, segun que dificultad anteriormente eligio.
     Ademas se le mostrara una introduccion a la tematica elegida. Y luego se devuelve la tematica elegida
     '''
-    dificultad = NivelDeDificultad()
+    dificultad = nivel_de_dificultad()
     print("Temáticas disponibles:")
     for i, tematica in enumerate(dificultad, 1):
         print(f"{i}: {tematica}")
 
-    seleccion = PedirOpcion(1, len(dificultad))
-    MostrarIntroduccionALaTematica(dificultad[seleccion - 1])
+    seleccion = pedir_opcion(1, len(dificultad))
+    mostrar_introduccion_a_la_tematica(dificultad[seleccion - 1])
     return dificultad[seleccion - 1]
 
 def cargar_introducciones():
     try:
-        with open("introducciones.json","r") as archivo:
-            introducciones = json.load(archivo)
-        return introducciones
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo de las introducciones")
-        return {}
+        ruta_archivo_instrucciones = os.path.join(os.getcwd(), "Data", "introducciones.json")
+        with open(ruta_archivo_instrucciones, "r") as introducciones_archivo:
+            introducciones = json.load(introducciones_archivo)
+            return introducciones
+        
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No se encontró el archivo o el contenido es inválido.")
+        return []
 
-def MostrarIntroduccionALaTematica(tematica):   
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return []
+
+def mostrar_introduccion_a_la_tematica(tematica):   
     '''
     Funcion que se encarga de mostrar la introduccion a una tematica
     '''
@@ -280,7 +290,7 @@ def MostrarIntroduccionALaTematica(tematica):
     print("¿Deseas comenzar el juego o salir?")
     print("1. Comenzar Juego")
     print("2. Salir")
-    seleccion = PedirOpcion(1, 2)
+    seleccion = pedir_opcion(1, 2)
     if seleccion == 1:
         print("Comenzando juego...")
     elif seleccion == 2:
@@ -289,17 +299,29 @@ def MostrarIntroduccionALaTematica(tematica):
     else:
         print("Por favor, ingresá una opción válida.")
 
-def InicializarPistas():
-   try:
-    with open("pistas.json", "r") as archivo:
-        pistas = json.load(archivo)
-    pistas_usadas = {key: [] for key in pistas.keys()}
-    return pistas, pistas_usadas
-   except FileNotFoundError:
-       print("No se encuentra el archivo de las pistas")
-       return {}
+def inicializar_pistas():
+    '''
+    Carga las pistas desde un archivo JSON ubicado en la carpeta Data.
+    Si el archivo no existe, retorna un diccionario vacío.
+    '''
+    try:
+        ruta_archivo_pistas = os.path.join(os.getcwd(), "Data", "pistas.json")
+        with open(ruta_archivo_pistas, "r") as pistas_archivo:
+            pistas = json.load(pistas_archivo)
+        pistas_usadas = {key: [] for key in pistas.keys()}
+        return pistas, pistas_usadas
 
-def MostrarPista(tematica, pistas, pistas_usadas):
+    except FileNotFoundError:
+        print("Error: No se encuentra el archivo de las pistas.")
+        return {}, {}
+    except json.JSONDecodeError:
+        print("Error: El archivo de pistas tiene un formato inválido.")
+        return {}, {}
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {}, {}
+
+def mostrar_pista(tematica, pistas, pistas_usadas):
     '''
     Funcion que recibe una tematica, pistas para la misma, y las pistas que fueron usadas, se encarga de mostrar una pista aleatoria de las disopnibles
     '''
@@ -315,23 +337,23 @@ def MostrarPista(tematica, pistas, pistas_usadas):
     else:
         print(f"Temática '{tematica}' no válida.")
 
-def MostrarDesafio(tematica, desafios, desafios_usados):
+def mostrar_desafio(tematica, desafios, desafios_usados):
     '''
     Funcion que recibe una tematica, desafios para la misma, y los desafios que fueron usados,
       se encarga de mostrar un desafio aleatorio de los disponibles
     '''
-    Fallo = True
+    fallo = True
     if tematica in desafios:
         disponibles = [desafios for desafios in desafios[tematica] if desafios not in desafios_usados[tematica]]
         
         if disponibles:
             desafios = random.choice(disponibles) 
-            while Fallo:
+            while fallo:
                 desafio = list(desafios.split("|"))
                 print(f"{desafio[1]}")
-                opcion = PedirOpcion(1,3)
+                opcion = pedir_opcion(1,3)
                 if(int(desafio[0])==opcion):
-                    Fallo = False
+                    fallo = False
                     print()
                     print("----- Bien, completaste el desafio -----")
                     print()
@@ -346,7 +368,7 @@ def MostrarDesafio(tematica, desafios, desafios_usados):
     else:
         print(f"Temática '{tematica}' no válida.")
 
-def InicializarDesafios():
+def inicializar_desafios():
     '''
     Funcion que se encarga de incializar los distintos desafios para que el usuario pueda utilizarlos en el juego.
     Devuelve los desafios disponibles y los jugados
@@ -360,7 +382,7 @@ def InicializarDesafios():
         print("No se encontro el archivo de los desafios")
         return {}
 
-def ModificarPuntos(puntos, accion):
+def modificar_puntos(puntos, accion):
     '''
     Modifica los puntos pasados por parametros segun la accion pasada por parametros, luego devuelve los puntos modificados
     '''
@@ -374,26 +396,26 @@ def ModificarPuntos(puntos, accion):
         puntos -= 10
     return puntos
 
-def MapaParaTematica(tematica):
+def mapa_para_tematica(tematica):
     '''
     Genera un mapa aleatorio para una tematica recibida por parametro
     '''
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
-        mapa = GenerarMapa(4,5,4,6) 
-        probabilidadFin = random.randint(40,100) # 83,3 %
-        habitacionesMax = 2
+        mapa = generar_mapa(4,5,4,6) 
+        probabilidad_fin = random.randint(40,100) # 83,3 %
+        habitaciones_max = 2
     elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
-        mapa = GenerarMapa(7,8,5,7)
-        probabilidadFin = random.randint(-20,100) # 41,6 %
-        habitacionesMax = 3
+        mapa = generar_mapa(7,8,5,7)
+        probabilidad_fin = random.randint(-20,100) # 41,6 %
+        habitaciones_max = 3
     elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
-        mapa = GenerarMapa(9,10,5,8)
-        probabilidadFin = random.randint(-100,100) # 25 %
-        habitacionesMax = 4
-    return mapa, probabilidadFin, habitacionesMax
+        mapa = generar_mapa(9,10,5,8)
+        probabilidad_fin = random.randint(-100,100) # 25 %
+        habitaciones_max = 4
+    return mapa, probabilidad_fin, habitaciones_max
 
-def ContieneElementos(lista1, lista2):
+def contiene_elementos(lista1, lista2):
     ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
     #Se recorre en el largo de lista2 (Para poder recorrer toda la segunda lista), se le resta el largo de la primera lista (para poder mirar desde i + el largo de lista1 sin pasarnos del indice)
     for i in range(0,len(lista2) - len(lista1) + 1,2):
@@ -402,73 +424,73 @@ def ContieneElementos(lista1, lista2):
             return True
     return False
 
-def ComenzarJuego(tematica,puntos = 0,nroHabitacion = 1):
+def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
     '''
     Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
     '''
     puntos = 1000 + puntos
-    Escapo = False
-    pistas, pistas_usadas = InicializarPistas()
-    desafios, desafios_usadas =InicializarDesafios()
-    mapa,probabilidadFin,habitacionesMax = MapaParaTematica(tematica)
-    if (probabilidadFin > 50 or nroHabitacion == habitacionesMax):
-        habitacionFinal = True
+    escapo = False
+    pistas, pistas_usadas = inicializar_pistas()
+    desafios, desafios_usadas =inicializar_desafios()
+    mapa,probabilidad_fin,habitaciones_max = mapa_para_tematica(tematica)
+    if (probabilidad_fin > 50 or nro_habitacion == habitaciones_max):
+        habitacion_final = True
     else:
-        habitacionFinal = False 
+        habitacion_final = False 
     objetos = ["#","$"]
     for i in objetos:
         if(i=="#"):
-            indicesPistas = GetIndiceObjeto(mapa,i) 
+            indices_pistas = get_indice_objeto(mapa,i) 
         else:
-            indicesCandados = GetIndiceObjeto(mapa,i)
-            cantCandandos = len(indicesCandados)//2
+            indices_candados = get_indice_objeto(mapa,i)
+            cant_candandos = len(indices_candados)//2
     
-    while not Escapo:
-        posicion_actual = GetIndiceObjeto(mapa,"O")
+    while not escapo:
+        posicion_actual = get_indice_objeto(mapa,"O")
         if(len(pistas_usadas.get(tematica)) == 0):
             print("Cuando encuentres una pista aparecera aca")
         else:
             print(pistas_usadas.get(tematica))
             
         
-        if(ContieneElementos(posicion_actual, indicesPistas)): 
+        if(contiene_elementos(posicion_actual, indices_pistas)): 
             print("----PISTA ENCONTRADA----")
-            MostrarPista(tematica, pistas, pistas_usadas)
-            puntos = ModificarPuntos(puntos, "usar_pista")
-            indicesPistas.remove(posicion_actual[0])
-            indicesPistas.remove(posicion_actual[1])
-        elif(ContieneElementos(posicion_actual, indicesCandados)):
-            MostrarDesafio(tematica, desafios, desafios_usadas)
-            cantCandandos -= 1
-            puntos = ModificarPuntos(puntos, "completar_desafio")
-            indicesCandados.remove(posicion_actual[0])
-            indicesCandados.remove(posicion_actual[1])
-            if(cantCandandos == 0):
-                if(habitacionFinal == True):
+            mostrar_pista(tematica, pistas, pistas_usadas)
+            puntos = modificar_puntos(puntos, "usar_pista")
+            indices_pistas.remove(posicion_actual[0])
+            indices_pistas.remove(posicion_actual[1])
+        elif(contiene_elementos(posicion_actual, indices_candados)):
+            mostrar_desafio(tematica, desafios, desafios_usadas)
+            cant_candandos -= 1
+            puntos = modificar_puntos(puntos, "completar_desafio")
+            indices_candados.remove(posicion_actual[0])
+            indices_candados.remove(posicion_actual[1])
+            if(cant_candandos == 0):
+                if(habitacion_final == True):
                     print("------ Felicitaciones, lograste escapar.... Por ahora.... ------")
-                    Escapo = True
+                    escapo = True
                 else:
                     print("------ Entrando en la siguiente habitacion.... ------")
-                    puntos, Escapo = ComenzarJuego(tematica,puntos,nroHabitacion+1)
+                    puntos, escapo = comenzar_juego(tematica,puntos,nro_habitacion+1)
 
-        if (not Escapo):        
-            RenderizarMapa(mapa)
-            accion = LeerAccion()
-            print(vaciarConsola)
+        if (not escapo):        
+            renderizar_mapa(mapa)
+            accion = leer_accion()
+            os.system('clear') 
             if accion == "menu":
                 print("Saliendo al menu principal...")
-                Escapo = True
+                escapo = True
                 puntos = 0
-            elif ValidarMovimiento(mapa, posicion_actual, accion):   
-                AccionPersonaje(mapa,accion)
-                puntos = ModificarPuntos(puntos,accion)
+            elif validar_movimiento(mapa, posicion_actual, accion):   
+                accion_personaje(mapa,accion)
+                puntos = modificar_puntos(puntos,accion)
                 print(f"Puntos actuales: {puntos}")
             else:
                 print("Movimiento inválido: fuera de los límites del mapa.")
         
-    return puntos, Escapo
+    return puntos, escapo
 
-def Instrucciones():
+def instrucciones():
     '''
     Muestra las instrucciones para poder jugar al juego
     '''
@@ -479,45 +501,54 @@ def Instrucciones():
     print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
     print("Buena suerte, la vas a necesitar.")
 
-def registrarPuntos(user,puntos):
+def registrar_puntos(user, puntos):
+    '''
+    Actualiza los puntos de un usuario en el archivo 'user_repository.json' si el nuevo puntaje es mayor al existente.
+    '''
     try:
-        with open("userRepository.json",mode="r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-        
-        jugador = list(filter(lambda x: x['Username']==user,userRepository))
-        if(puntos > jugador[0]["Puntos"]):
-            for users in userRepository:
-                if(users['Id'] == jugador[0]['Id'] ):
-                    users['Puntos'] = puntos
-            
-            with open("userRepository.json","w") as userRepositoryArchivo:
-                json.dump(userRepository,userRepositoryArchivo)
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
+        ruta_archivo_puntos = os.path.join(os.getcwd(), "Data", "user_repository.json")
+        with open(ruta_archivo_puntos, mode="r") as user_repository_archivo:
+            user_repository = json.load(user_repository_archivo)
+
+        jugador = next((u for u in user_repository if u['Username'] == user), None)
+        if jugador:
+            if puntos > jugador["Puntos"]:
+                jugador["Puntos"] = puntos
+                with open(ruta_archivo_puntos, "w") as user_repository_archivo:
+                    json.dump(user_repository, user_repository_archivo, indent=4)
+                print(f"Puntos actualizados para el usuario '{user}': {puntos}")
+            else:
+                print(f"El usuario '{user}' ya tiene un puntaje mayor o igual: {jugador['puntos']}")
+        else:
+            print(f"Error: El usuario '{user}' no existe en el repositorio.")
+
     except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        print("Error: No se encontró el archivo 'user_repository.json'.")
+    except json.JSONDecodeError:
+        print("Error: El archivo 'user_repository.json' tiene un formato inválido.")
+    except Exception as e:
+        print(f"Error inesperado: {e}")
 
-
-def PrimerosUltimosRanking(usuarios,primeros):
-    usuariosOrdenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
+def primeros_ultimos_ranking(usuarios,primeros):
+    usuarios_ordenados = list(sorted(usuarios,key= lambda x: x["puntos"],reverse=primeros))
     if(primeros):
         x=1
     else:
-        x=len(usuariosOrdenados)
+        x=len(usuarios_ordenados)
     
-    rank = usuariosOrdenados[:10]
+    rank = usuarios_ordenados[:10]
     
-    print(f"\tPuesto\t - \tNombre\t - \tPuntuacion Máxima")
+    print(f"\tPuesto:\t - \tNombre:\t - \tPuntuacion Máxima:")
     for users in rank:
-        print(f"\t{x}\t - \t{users['Username']}\t - \t{usuarios['Puntos']}")
+        print(f"\t{x}\t - \t{users['username']}\t - \t{usuarios['puntos']}")
         if(primeros):
             x+=1
         else:
             x-=1
 
-def RankingJugador(users,username = None):
+def ranking_jugador(users,username = None):
     if(username is None):
-        username = PedirUserName()
+        username = pedir_user_name()
 
     jugador = list(filter(lambda x: x['Username']==username,users))
     try:
@@ -525,15 +556,15 @@ def RankingJugador(users,username = None):
     except:
         print("El jugador no existe")
 
-def Ranking(user):
+def ranking(user):
     try:
-        with open("userRepository.json",mode="r") as userRepositoryArchivo:
-            userRepository=json.load(userRepositoryArchivo)
-            RankList = [user for user in list(userRepository)]
-    except IOError:
-        print("Error, no se pudo abrir el archivo")
-    except FileNotFoundError:
-        print("Error, no se encontro el archivo")
+        ruta_archivo_ranking = os.path.join(os.getcwd(), "Data", "user_repository.json")
+        with open(ruta_archivo_ranking, mode="r") as user_repository_archivo:
+            user_repository = json.load(user_repository_archivo)
+            rank_list = user_repository
+    except (IOError, FileNotFoundError):
+        print("Error al abrir o encontrar el archivo 'user_repository.json'.")
+        return
     
     opcion = 0
     while(opcion != 5):
@@ -544,17 +575,17 @@ def Ranking(user):
         print("3. Ver peores puntuaciones.")
         print("4. Mi mejor puntuacion.")
         print("5. Salir.")
-        opcion = PedirOpcion(1,5)
+        opcion = pedir_opcion(1,5)
         print()
 
         if(opcion == 1):
-            PrimerosUltimosRanking(RankList,True)
+            primeros_ultimos_ranking(rank_list,True)
         elif (opcion == 2):
-            RankingJugador(RankList)
+            ranking_jugador(rank_list)
         elif (opcion == 3):
-            PrimerosUltimosRanking(RankList,False)
+            primeros_ultimos_ranking(rank_list,False)
         elif (opcion == 4):
-            RankingJugador(RankList,user)
+            ranking_jugador(rank_list,user)
         elif (opcion == 5):
             print("Saliendo...")
         else:
@@ -565,26 +596,26 @@ def main():
     '''
     Programa Principal
     '''
-    user = PedirUserName()
-    GenerarUser(user)
+    user = pedir_user_name()
+    generar_user(user)
     jugando = True
     tematica = 0
     while(jugando):
         os.system('clear') 
-        MenuPrincipal(user)
-        opcion = PedirOpcion(1,4)
+        menu_principal(user)
+        opcion = pedir_opcion(1,4)
         if(opcion == 1):
-            tematica = ElegirTematica()
-            puntos, escapo = ComenzarJuego(tematica)
+            tematica = elegir_tematica()
+            puntos, escapo = comenzar_juego(tematica)
             if puntos > 0 and escapo:
                 print("Felicidades, escapaste")
-                registrarPuntos(user,puntos)
+                registrar_puntos(user,puntos)
             else:
                 print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
-            Ranking(user)
+            ranking(user)
         elif (opcion == 3):
-            Instrucciones()
+            instrucciones()
         elif (opcion == 4):
             print("Gracias por Jugar! Saliendo...")
             jugando = False
