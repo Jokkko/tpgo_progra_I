@@ -4,7 +4,6 @@ import json
 import os
 
 terreno = " "
-vaciar_consola = "\n" * 50
 
 def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     '''
@@ -46,7 +45,6 @@ def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
             generar_objeto(mapa,i,1)
         else:
             generar_objeto(mapa,i,2) 
-        
     return mapa
 
 def renderizar_mapa(mapa):
@@ -478,7 +476,7 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
         if (not escapo):        
             renderizar_mapa(mapa)
             accion = leer_accion()
-            print(vaciar_consola)
+            os.system('clear') 
             if accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
@@ -496,6 +494,7 @@ def instrucciones():
     '''
     Muestra las instrucciones para poder jugar al juego
     '''
+    os.system('clear')  # Limpiar la consola
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
     print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
@@ -569,6 +568,7 @@ def ranking(user):
     
     opcion = 0
     while(opcion != 5):
+        os.system('clear')
         print()
         print("1. Ver mejores puntuaciones.")
         print("2. Buscar jugador.")
@@ -601,6 +601,7 @@ def main():
     jugando = True
     tematica = 0
     while(jugando):
+        os.system('clear') 
         menu_principal(user)
         opcion = pedir_opcion(1,4)
         if(opcion == 1):
