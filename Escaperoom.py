@@ -1,6 +1,7 @@
 import random
 import re
 import json
+import os
 
 terreno = " "
 vaciarConsola = "\n" * 50
@@ -49,7 +50,6 @@ def GenerarMapa(alturaMin,alturaMax,anchoMin,anchoMax):
             GenerarObjeto(mapa,i,1)
         else:
             GenerarObjeto(mapa,i,2) 
-        
     return mapa
 
 def RenderizarMapa(mapa):
@@ -472,6 +472,7 @@ def Instrucciones():
     '''
     Muestra las instrucciones para poder jugar al juego
     '''
+    os.system('clear')  # Limpiar la consola
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
     print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
@@ -536,6 +537,7 @@ def Ranking(user):
     
     opcion = 0
     while(opcion != 5):
+        os.system('clear')
         print()
         print("1. Ver mejores puntuaciones.")
         print("2. Buscar jugador.")
@@ -568,6 +570,7 @@ def main():
     jugando = True
     tematica = 0
     while(jugando):
+        os.system('clear') 
         MenuPrincipal(user)
         opcion = PedirOpcion(1,4)
         if(opcion == 1):
