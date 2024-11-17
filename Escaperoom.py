@@ -6,7 +6,15 @@ from readchar import readkey, key
 import threading
 import time
 
-terreno = " "
+# Constantes
+TERRENO = " "
+PERSONAJE = "O"
+CANDADO = "$"
+PISTA = "#"
+PUNTOS_INICIALES = 1000
+COSTO_PISTA = 100
+PUNTOS_DESAFIO = 500
+PUNTOS_MOVIMIENTO = 10
 
 def vaciar_consola():
     """
@@ -58,7 +66,7 @@ def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     ancho_minimo_del_mapa = random.randint(ancho_min,ancho_max) 
 
     for _ in range(alto_del_mapa):
-        mapa.append([terreno for _ in range(ancho_minimo_del_mapa)])
+        mapa.append([TERRENO for _ in range(ancho_minimo_del_mapa)])
         
 def generar_objeto(mapa,objeto,cantidad):
     '''
@@ -68,7 +76,7 @@ def generar_objeto(mapa,objeto,cantidad):
     columna_spawn = random.randint(0,len(mapa)-1) 
     fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
     for _ in range(cantidad):
-        while(mapa[columna_spawn][fila_spawn] != terreno): 
+        while(mapa[columna_spawn][fila_spawn] != TERRENO): 
             columna_spawn = random.randint(0,len(mapa)-1) 
             fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
         mapa[columna_spawn][fila_spawn] = objeto
@@ -79,13 +87,9 @@ def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
     Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
     '''
     mapa = []
-    personaje = "O"
-    candados = "$"
-    pistas = "#"
-    objetos = [personaje,candados,pistas]
     generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max)
-    for i in objetos:
-        if(i == personaje):
+    for i in [PERSONAJE, CANDADO, PISTA]:
+        if(i == PERSONAJE):
             generar_objeto(mapa,i,1)
         else:
             generar_objeto(mapa,i,2) 
@@ -98,6 +102,13 @@ def renderizar_mapa(mapa):
     '''
     for fila in mapa:
         print(fila)
+        
+def mostrar_tiempo(timer):
+    """
+    Muestra el tiempo transcurrido en la esquina superior
+    """
+    print(f"Tiempo: {timer.obtener_tiempo()}")
+    print()
 
 def leer_accion():
     '''
@@ -159,23 +170,21 @@ def mover_objeto(mapa,x,y,objeto):
     y tantas veces en y como diga el parametro.
     '''
     coordenadas_objeto = get_indice_objeto(mapa,objeto)
-    mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = terreno
+    mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = TERRENO
     mapa[coordenadas_objeto[0]+y*(-1)][coordenadas_objeto[1]+x] = objeto
 
 def accion_personaje(mapa,accion): 
     '''
     Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion mover_objeto, para mover al personaje segun la accion elegida
     '''
-    personaje = "O"
-    
     if  (accion == "w"):
-        mover_objeto(mapa,0,1,personaje)
+        mover_objeto(mapa,0,1,PERSONAJE)
     elif(accion == "s"):
-        mover_objeto(mapa,0,-1,personaje) 
+        mover_objeto(mapa,0,-1,PERSONAJE) 
     elif(accion == "a"):
-        mover_objeto(mapa,-1,0,personaje)
+        mover_objeto(mapa,-1,0,PERSONAJE)
     elif(accion == "d"):
-        mover_objeto(mapa,1,0,personaje)
+        mover_objeto(mapa,1,0,PERSONAJE)
 
 
 def menu_principal(user):
@@ -216,7 +225,7 @@ def pedir_user_names():
 
 def generar_user(username):
     '''
-    Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
+    Genera el registro del usuario nuevo generando una id, y asociándole el nombre de usuario.
     '''
     user_repository = cargar_archivo_json("user_repository.json")
     if not user_repository:
@@ -248,28 +257,18 @@ def generar_id(user_repository):
         id = user_repository[ultimo]['id'] + 1
     return id
 
-def pedir_opcion(min, max):
+def pedir_opcion(min,max):
     '''
-    Función que pide y valida una opción numérica entre un mínimo y máximo.
-    Maneja entradas vacías, no numéricas y fuera de rango.
+    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
     '''
-    while True:
-        try:
-            entrada = input(f"Elija una opcion entre {min} y {max}: ").strip()
-            
-            if not entrada:
-                print("Error: No ingresó ningún valor. Por favor, ingrese un número.")
-            else:
-                opcion = int(entrada)
-                
-                if opcion < min or opcion > max:
-                    print(f"Error: La opción debe estar entre {min} y {max}.")
-                else:
-                    print()
-                    return opcion
-                    
-        except ValueError:
-            print("Error: Debe ingresar un número válido.")
+    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+    
+    while opcion < min or opcion > max:
+        print("Error, la opción ingresada no es válida.")
+        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+    
+    print()
+    return opcion
 
 def mostrar_dificultades():
     '''
@@ -356,8 +355,7 @@ def mostrar_introduccion_a_la_tematica(tematica):
 
 def inicializar_pistas():
     '''
-    Carga las pistas desde un archivo JSON ubicado en la carpeta Data.
-    Si el archivo no existe, retorna un diccionario vacío.
+    Carga las pistas desde un archivo JSON
     '''
     pistas = cargar_archivo_json("pistas.json")
     pistas_usadas = {key: [] for key in pistas.keys()}
@@ -412,8 +410,7 @@ def mostrar_desafio(tematica, desafios, desafios_usados):
 
 def inicializar_desafios():
     '''
-    Funcion que se encarga de incializar los distintos desafios para que el usuario pueda utilizarlos en el juego.
-    Devuelve los desafios disponibles y los jugados
+    Carga los desafíos desde un archivo JSON
     '''
     desafios = cargar_archivo_json("desafios.json")
     desafios_usados = {key: [] for key in desafios.keys()}
@@ -421,17 +418,15 @@ def inicializar_desafios():
 
 def modificar_puntos(puntos, accion):
     '''
-    Modifica los puntos pasados por parametros segun la accion pasada por parametros, luego devuelve los puntos modificados
+    Modifica los puntos según la acción realizada
     '''
-    if accion == "usar_pista":
-        puntos -= 100
-    elif accion == "completar_desafio":
-        puntos += 500
-    elif accion == "accion_correcta":
-        puntos += 10
-    else:
-        puntos -= 10
-    return puntos
+    modificaciones = {
+        "usar_pista": -COSTO_PISTA,
+        "completar_desafio": PUNTOS_DESAFIO,
+        "accion_correcta": PUNTOS_MOVIMIENTO,
+        "accion_incorrecta": -PUNTOS_MOVIMIENTO
+    }
+    return puntos + modificaciones.get(accion, -PUNTOS_MOVIMIENTO)
 
 def mapa_para_tematica(tematica):
     '''
@@ -461,7 +456,7 @@ def contiene_elementos(lista1, lista2):
 
 def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
     '''
-    Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
+    Funcion que provoca que el juego comienze
     '''
     puntos = 1000 + puntos
     escapo = False
@@ -484,13 +479,13 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             cant_candandos = len(indices_candados)//2
     
     while not escapo:
-        vaciar_consola()
-        mostrar_tiempo(timer)
         posicion_actual = get_indice_objeto(mapa,"O")
+        mostrar_tiempo(timer)
+        
         if(len(pistas_usadas.get(tematica)) == 0):
-            print("Cuando encuentres una pista aparecera acá.")
+            print("Cuando encuentres una pista aparecera aca")
         else:
-            print(pistas_usadas.get(tematica))      
+            print(pistas_usadas.get(tematica))
         
         if(contiene_elementos(posicion_actual, indices_pistas)): 
             print("----PISTA ENCONTRADA----")
@@ -515,7 +510,7 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
         if (not escapo):
             renderizar_mapa(mapa)
             accion = leer_accion()
-            print(vaciar_consola)
+            
             if accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
@@ -543,7 +538,7 @@ def instrucciones():
 
 def registrar_puntos(user, puntos):
     '''
-    Actualiza los puntos de un usuario en el archivo 'user_repository.json' si el nuevo puntaje es mayor al existente.
+    Actualiza los puntos de un usuario si el nuevo puntaje es mayor al existente
     '''
     user_repository = cargar_archivo_json("user_repository.json")
     if not user_repository:
@@ -563,33 +558,6 @@ def registrar_puntos(user, puntos):
     else:
         print(f"Error: El usuario '{user}' no existe en el repositorio.")
 
-def primeros_ultimos_ranking(usuarios, primeros):
-    '''
-    Muestra los primeros o últimos 10 usuarios del ranking
-    primeros: True para mostrar mejores puntuaciones, False para las peores
-    '''
-    if not usuarios: 
-        print("No hay usuarios registrados en el ranking.")
-        return
-        
-    usuarios_ordenados = sorted(usuarios, key=lambda x: x.get('puntos', 0), reverse=primeros)
-    
-    rank = usuarios_ordenados[:10]
-    
-    print("\n\t{:<8} {:<15} {:<10}".format("Puesto", "Nombre", "Puntos"))
-    print("\t" + "-" * 35)
-    
-    for i, user in enumerate(rank, 1):
-        puesto = i if primeros else len(usuarios) - i + 1
-        print("\t{:<8} {:<15} {:<10}".format(
-            puesto,
-            user.get('username', 'N/A'), 
-            user.get('puntos', 0)
-        ))
-    
-    print()
-    input("Presione Enter para continuar...")
-
 def ranking_jugador(users, username=None):
     '''
     Muestra el ranking de un jugador específico
@@ -597,17 +565,54 @@ def ranking_jugador(users, username=None):
     if username is None:
         username = pedir_user_name()
 
-    jugador = list(filter(lambda x: x['username']==username,users))
-    try:
-        print(f"{jugador[0]['username']} tiene {jugador[0]['Puntos']} de puntuacion maxima.")
-    except:
-        print("El jugador no existe")
+    jugador = next((user for user in users 
+                   if user.get('username', '').lower() == username.lower()), None)
+    
+    if jugador:
+        print(f"\nJugador: {jugador['username']}")
+        print(f"Puntuación máxima: {jugador.get('puntos', 0)}")
+    else:
+        print(f"\nNo se encontró al jugador '{username}'")
+    
+    input("\nPresione Enter para continuar...")
+
+def primeros_ultimos_ranking(usuarios, primeros):
+    '''
+    Muestra los primeros o últimos 10 usuarios del ranking
+    primeros: True para mejores puntuaciones, False para peores
+    '''
+    if not usuarios:
+        print("\nNo hay usuarios registrados en el ranking.")
+        input("\nPresione Enter para continuar...")
+        return
+    
+    usuarios_ordenados = sorted(
+        usuarios,
+        key=lambda x: x.get('puntos', 0),
+        reverse=primeros
+    )
+    
+    rank = usuarios_ordenados[:10]
+    
+    print("\n{:<6} {:<15} {:<10}".format("Puesto", "Usuario", "Puntos"))
+    print("-" * 35)
+    
+    for i, user in enumerate(rank, 1):
+        puesto = i if primeros else len(usuarios) - i + 1
+        print("{:<6} {:<15} {:<10}".format(
+            puesto,
+            user.get('username', 'N/A'),
+            user.get('puntos', 0)
+        ))
+    
+    input("\nPresione Enter para continuar...")
 
 def ranking(user):
     '''
     Menú principal del ranking
     '''
-    while True:
+    menu_activo = True
+    while menu_activo:
         vaciar_consola()
         print("\n=== RANKING DE JUGADORES ===")
         print("1. Ver mejores puntuaciones")
@@ -633,18 +638,12 @@ def ranking(user):
                 ranking_jugador(user_repository, user)
             elif opcion == 5:
                 print("\nVolviendo al menú principal...")
-                break
+                menu_activo = False
                 
         except Exception as e:
             print(f"\nError inesperado: {e}")
             input("\nPresione Enter para continuar...")
 
-
-def mostrar_tiempo(timer):
-    '''
-    Muestra el tiempo transcurrido en el formato mm:ss
-    '''
-    print(f"Tiempo transcurrido: {timer.obtener_tiempo()}")
 class Timer:
     def __init__(self):
         self.segundos = 0
