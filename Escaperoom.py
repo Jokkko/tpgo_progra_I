@@ -2,6 +2,7 @@ import random
 import re
 import json
 import os
+from readchar import readkey, key
 
 terreno = " "
 vaciar_consola = "\n" * 50
@@ -61,12 +62,18 @@ def leer_accion():
     Lee de la entrada un string ingresado por el usuario, verifica que este dentro de las acciones validas ('w', 'a', 's', 'd','menu')
     y devuelve la accion validada
     '''
-    acciones_validas = {'w', 'a', 's', 'd','menu'}
-    accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
-    while accion not in acciones_validas:
-        print("Acción no válida. Intentálo de nuevo.")
-        accion = input("Elija una acción ('W', 'A', 'S', 'D' para el movimiento o 'menu' para salir al menu): ").lower()
-    return accion
+    while True:
+        k = readkey()
+        if k == key.UP or k.lower() == 'w':
+            return 'w'
+        elif k == key.LEFT or k.lower() == 'a':
+            return 'a'
+        elif k == key.DOWN or k.lower() == 's':
+            return 's'
+        elif k == key.RIGHT or k.lower() == 'd':
+            return 'd'
+        elif k.lower() == 'm':
+            return 'menu'
 
 def validar_movimiento(mapa, posicion_actual, accion):
     '''
@@ -216,7 +223,7 @@ def pedir_opcion(min,max):
     opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     while opcion < min or opcion > max:
-        print("Error")
+        print("Error, la opción ingresada no es válida.")
         opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
     
     print()
