@@ -645,7 +645,7 @@ def ranking(user):
             input("\nPresione Enter para continuar...")
 
 class Timer:
-    def _init_(self):
+    def __init__(self):
         self.segundos = 0
         self.activo = True
         self.thread = threading.Thread(target=self._contar)
