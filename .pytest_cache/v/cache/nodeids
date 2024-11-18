@@ -1,0 +1,10 @@
+[
+  "test.py::test_generar_objeto",
+  "test.py::test_generar_terreno",
+  "test.py::test_get_indice_objeto",
+  "test.py::test_inicializar_desafios",
+  "test.py::test_inicializar_pistas",
+  "test.py::test_modificar_puntos",
+  "test.py::test_mover_objeto",
+  "test.py::test_validar_movimiento"
+]
