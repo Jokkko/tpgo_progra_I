@@ -1,0 +1,62 @@
+[
+    {
+        "id": 0,
+        "username": "Joko",
+        "puntos": 1231
+    },
+    {
+        "id": 1,
+        "username": "Clarib",
+        "puntos": 1500
+    },
+    {
+        "id": 2,
+        "username": "Luki",
+        "puntos": 2000
+    },
+    {
+        "id": 3,
+        "username": "Juan",
+        "puntos": 2000
+    },
+    {
+        "id": 4,
+        "username": "Carlos",
+        "puntos": 2000
+    },
+    {
+        "id": 5,
+        "username": "Nini",
+        "puntos": 2000
+    },
+    {
+        "id": 6,
+        "username": "Nono",
+        "puntos": 1500
+    },
+    {
+        "id": 7,
+        "username": "Gaston",
+        "puntos": 2000
+    },
+    {
+        "id": 8,
+        "username": "More",
+        "puntos": 2000
+    },
+    {
+        "id": 9,
+        "username": "Wara",
+        "puntos": 2000
+    },
+    {
+        "id": 10,
+        "username": "Nico",
+        "puntos": 9999999
+    },
+    {
+        "username": "Pepe",
+        "id": 11,
+        "puntos": 1930
+    }
+]

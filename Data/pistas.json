@@ -1,0 +1,62 @@
+{
+    "Breaking Bad": [
+        "Busca en el laboratorio un objeto que brilla en la oscuridad.",
+        "El equipo de proteccion personal es clave para el exito. Revisa las cajas.",
+        "Las formulas están escondidas en los documentos; no olvides mirar en las carpetas.",
+        "La quimica puede ser peligrosa. Estudia los frascos con atencion.",
+        "Los barriles azules contienen algo más que productos químicos, ¿lo puedes descifrar?",
+        "El Bunsen burner parece apagado, pero ¿qué pasa si lo enciendes?",
+        "En el fondo de los cajones hay algo escrito, ¿puedes encontrarlo?",
+        "La máscara de gas no es solo para protección, revisa su interior.",
+        "Los imanes en la pizarra podrían formar un patrón significativo."
+    ],
+    "Muerte Anunciada": [
+        "Revisa la habitacion donde se celebro la fiesta, hay mas de lo que parece.",
+        "Algunos invitados saben mas de lo que dicen. Escucha con atencion.",
+        "Los periodicos antiguos pueden contener pistas sobre el asesinato.",
+        "Un objeto olvidado podria ser la clave para resolver el misterio.",
+        "El reloj en la pared no marca la hora correcta, ajustarlo podría revelarte algo.",
+        "Los cubiertos de la fiesta parecen normales, pero uno está fuera de lugar.",
+        "Una vieja fotografía en la sala podría contener una pista vital.",
+        "Escucha las grabaciones de audio que dejaron; ¿notas algo extraño?",
+        "En el jardín hay huellas que no deberían estar ahí."
+    ],
+    "Psiquiátrico": [
+        "Las habitaciones son un laberinto; sigue las marcas en la pared.",
+        "El diario del ultimo paciente podria revelarte informacion crucial.",
+        "Revisa los cuadros; algunos pueden esconder secretos oscuros.",
+        "Las notas médicas en el escritorio están incompletas; encuentra las páginas faltantes.",
+        "Hay sonidos extraños en los ductos de ventilación, ¿te atreves a investigarlos?",
+        "Las cerraduras electrónicas tienen un patrón, pero hay que encontrar el código correcto.",
+        "Las luces intermitentes parecen formar un mensaje en clave Morse.",
+        "Una silla de ruedas en el pasillo parece tener algo oculto en su asiento."
+    ],
+    "La Casa de Papel": [
+        "El plano del banco tiene detalles que podrian ser utiles. No lo ignores.",
+        "Cada miembro del equipo tiene una habilidad unica; usalas a tu favor.",
+        "Hay camaras en todo el lugar; busca la manera de desactivarlas.",
+        "Los lingotes de oro parecen sólidos, pero revisa si uno esconde algo.",
+        "Las radios del equipo tienen frecuencias alternas, ¿puedes usarlas?",
+        "El piso del banco tiene un panel suelto, ¿qué hay debajo?",
+        "Una alarma silenciada puede ser tu aliada, si sabes cómo reactivarla en el momento justo.",
+        "El uniforme del guardia tiene algo más que botones y bolsillos."
+    ],
+    "Sherlock Holmes": [
+        "La carta en la mesa contiene un mensaje cifrado; decodificalo.",
+        "No todos los sospechosos son lo que parecen; investiga sus coartadas.",
+        "Un paraguas olvidado en el rincón parece insignificante, pero guarda un secreto.",
+        "Los libros en el estante tienen marcas; ¿puedes unirlas para descifrar un mensaje?",
+        "Un cigarrillo a medio fumar en el cenicero podría tener información importante.",
+        "Una huella en el suelo apunta hacia un lugar inesperado.",
+        "El violín de Sherlock no es solo un adorno; podría ser una herramienta."
+    ],
+    "Misión Gubernamental": [
+        "Un dispositivo escondido puede cambiar el curso de la mision; buscalo.",
+        "Las comunicaciones pueden estar interceptadas. Encuentra el canal seguro.",
+        "Hay un maletín con un candado numérico, pero el código está encriptado en el mural.",
+        "Una computadora bloqueada necesita una contraseña; el teclado tiene pistas.",
+        "Una antena en el techo parece desconectada; ¿qué sucede si la arreglas?",
+        "Hay mapas en la pared, pero uno tiene un punto marcado que no coincide con los demás.",
+        "El reloj de bolsillo de un espía tiene más funciones de las aparentes."
+    ]
+}
