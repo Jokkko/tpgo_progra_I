@@ -3,9 +3,59 @@ import re
 import json
 import os
 from readchar import readkey, key
+import threading
+import time
 
-terreno = " "
-vaciar_consola = "\n" * 50
+# Constantes
+TERRENO = " "
+PERSONAJE = "O"
+CANDADO = "$"
+PISTA = "#"
+PUNTOS_INICIALES = 1000
+COSTO_PISTA = 100
+PUNTOS_DESAFIO = 500
+PUNTOS_MOVIMIENTO = 10
+
+def vaciar_consola():
+    """
+    Limpia la consola de manera compatible con Windows y Unix/Mac
+    """
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
+def cargar_archivo_json(nombre_archivo):
+    '''
+    Función genérica para cargar archivos JSON
+    Retorna el contenido del archivo o un diccionario vacío si hay error
+    '''
+    try:
+        ruta_archivo = os.path.join(os.getcwd(), "Data", nombre_archivo)
+        with open(ruta_archivo, "r") as archivo:
+            return json.load(archivo)
+    except FileNotFoundError:
+        print(f"Error: No se encuentra el archivo {nombre_archivo}")
+        return {}
+    except json.JSONDecodeError:
+        print(f"Error: El archivo {nombre_archivo} tiene un formato inválido.")
+        return {}
+    except Exception as e:
+        print(f"Error inesperado: {e}")
+        return {}
+
+def guardar_archivo_json(nombre_archivo, datos):
+    '''
+    Función genérica para guardar datos en archivos JSON
+    '''
+    try:
+        ruta_archivo = os.path.join(os.getcwd(), "Data", nombre_archivo)
+        with open(ruta_archivo, "w") as archivo:
+            json.dump(datos, archivo, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error al guardar {nombre_archivo}: {e}")
+        return False
 
 def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     '''
@@ -16,7 +66,7 @@ def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
     ancho_minimo_del_mapa = random.randint(ancho_min,ancho_max) 
 
     for _ in range(alto_del_mapa):
-        mapa.append([terreno for _ in range(ancho_minimo_del_mapa)])
+        mapa.append([TERRENO for _ in range(ancho_minimo_del_mapa)])
         
 def generar_objeto(mapa,objeto,cantidad):
     '''
@@ -26,7 +76,7 @@ def generar_objeto(mapa,objeto,cantidad):
     columna_spawn = random.randint(0,len(mapa)-1) 
     fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
     for _ in range(cantidad):
-        while(mapa[columna_spawn][fila_spawn] != terreno): 
+        while(mapa[columna_spawn][fila_spawn] != TERRENO): 
             columna_spawn = random.randint(0,len(mapa)-1) 
             fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
         mapa[columna_spawn][fila_spawn] = objeto
@@ -37,13 +87,9 @@ def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
     Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
     '''
     mapa = []
-    personaje = "O"
-    candados = "$"
-    pistas = "#"
-    objetos = [personaje,candados,pistas]
     generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max)
-    for i in objetos:
-        if(i == personaje):
+    for i in [PERSONAJE, CANDADO, PISTA]:
+        if(i == PERSONAJE):
             generar_objeto(mapa,i,1)
         else:
             generar_objeto(mapa,i,2) 
@@ -56,6 +102,13 @@ def renderizar_mapa(mapa):
     '''
     for fila in mapa:
         print(fila)
+        
+def mostrar_tiempo(timer):
+    """
+    Muestra el tiempo transcurrido en la esquina superior
+    """
+    print(f"Tiempo: {timer.obtener_tiempo()}")
+    print()
 
 def leer_accion():
     '''
@@ -117,23 +170,21 @@ def mover_objeto(mapa,x,y,objeto):
     y tantas veces en y como diga el parametro.
     '''
     coordenadas_objeto = get_indice_objeto(mapa,objeto)
-    mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = terreno
+    mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = TERRENO
     mapa[coordenadas_objeto[0]+y*(-1)][coordenadas_objeto[1]+x] = objeto
 
 def accion_personaje(mapa,accion): 
     '''
     Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion mover_objeto, para mover al personaje segun la accion elegida
     '''
-    personaje = "O"
-    
     if  (accion == "w"):
-        mover_objeto(mapa,0,1,personaje)
+        mover_objeto(mapa,0,1,PERSONAJE)
     elif(accion == "s"):
-        mover_objeto(mapa,0,-1,personaje) 
+        mover_objeto(mapa,0,-1,PERSONAJE) 
     elif(accion == "a"):
-        mover_objeto(mapa,-1,0,personaje)
+        mover_objeto(mapa,-1,0,PERSONAJE)
     elif(accion == "d"):
-        mover_objeto(mapa,1,0,personaje)
+        mover_objeto(mapa,1,0,PERSONAJE)
 
 
 def menu_principal(user):
@@ -174,37 +225,27 @@ def pedir_user_names():
 
 def generar_user(username):
     '''
-    Funcion que genera el registro del usuario nuevo generando una id, y asociandole el nombre de usuario.
+    Genera el registro del usuario nuevo generando una id, y asociándole el nombre de usuario.
     '''
-    try:
-        ruta_archivo_user = os.path.join(os.getcwd(), "Data", "user_repository.json")
-        try:
-            with open(ruta_archivo_user, "r") as user_repository_archivo:
-                user_repository = json.load(user_repository_archivo)
-        except (FileNotFoundError, json.JSONDecodeError):
-            user_repository = []
+    user_repository = cargar_archivo_json("user_repository.json")
+    if not user_repository:
+        user_repository = []
 
-        while any(user['username'] == username for user in user_repository):
-            print(f"El nombre de usuario '{username}' ya está en uso. Intente con otro.")
-            username = pedir_user_name()
-        
-        nuevo_usuario = {
-            "username": username,
-            "id": generar_id(user_repository),
-            "puntos": 0
-        }
-        user_repository.append(nuevo_usuario)
-
-        with open(ruta_archivo_user, "w") as archivo:
-            json.dump(user_repository, archivo, indent=4)
-
+    while any(user['username'] == username for user in user_repository):
+        print(f"El nombre de usuario '{username}' ya está en uso. Intente con otro.")
+        username = pedir_user_name()
+    
+    nuevo_usuario = {
+        "username": username,
+        "id": generar_id(user_repository),
+        "puntos": 0
+    }
+    user_repository.append(nuevo_usuario)
+    
+    if guardar_archivo_json("user_repository.json", user_repository):
         print(f"Usuario '{username}' registrado con éxito.")
-
-    except (FileNotFoundError, IOError) as e:
-        print(f"Error de archivo: {e}")
-    except Exception as e:
-        print(f"Error inesperado: {e}")
-
+    else:
+        print("Error al registrar el usuario.")
 
 def generar_id(user_repository):
     '''
@@ -216,25 +257,18 @@ def generar_id(user_repository):
         id = user_repository[ultimo]['id'] + 1
     return id
 
-def pedir_opcion(min, max):
+def pedir_opcion(min,max):
     '''
-    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo,
-    valida que sea un número y que esté dentro del rango, luego devuelve la opcion elegida
+    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
     '''
-    while True:
-        try:
-            opcion = input(f"Elija una opcion entre {min} y {max}: ")
-            opcion = int(opcion)
-            
-            if opcion < min or opcion > max:
-                print("Error, la opción debe estar entre los valores indicados.")
-                continue
-            
-            print()
-            return opcion
-            
-        except ValueError:
-            print("Error, debe ingresar un número válido.")
+    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+    
+    while opcion < min or opcion > max:
+        print("Error, la opción ingresada no es válida.")
+        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+    
+    print()
+    return opcion
 
 def mostrar_dificultades():
     '''
@@ -321,25 +355,11 @@ def mostrar_introduccion_a_la_tematica(tematica):
 
 def inicializar_pistas():
     '''
-    Carga las pistas desde un archivo JSON ubicado en la carpeta Data.
-    Si el archivo no existe, retorna un diccionario vacío.
+    Carga las pistas desde un archivo JSON
     '''
-    try:
-        ruta_archivo_pistas = os.path.join(os.getcwd(), "Data", "pistas.json")
-        with open(ruta_archivo_pistas, "r") as pistas_archivo:
-            pistas = json.load(pistas_archivo)
-        pistas_usadas = {key: [] for key in pistas.keys()}
-        return pistas, pistas_usadas
-
-    except FileNotFoundError:
-        print("Error: No se encuentra el archivo de las pistas.")
-        return {}, {}
-    except json.JSONDecodeError:
-        print("Error: El archivo de pistas tiene un formato inválido.")
-        return {}, {}
-    except Exception as e:
-        print(f"Error inesperado: {e}")
-        return {}, {}
+    pistas = cargar_archivo_json("pistas.json")
+    pistas_usadas = {key: [] for key in pistas.keys()}
+    return pistas, pistas_usadas
 
 def mostrar_pistas(tematica, pistas, pistas_usadas):
     '''
@@ -390,40 +410,23 @@ def mostrar_desafio(tematica, desafios, desafios_usados):
 
 def inicializar_desafios():
     '''
-    Funcion que se encarga de incializar los distintos desafios para que el usuario pueda utilizarlos en el juego.
-    Devuelve los desafios disponibles y los jugados
+    Carga los desafíos desde un archivo JSON
     '''
-    try:
-        ruta_archivo_desafios = os.path.join(os.getcwd(), "Data", "desafios.json")
-        with open(ruta_archivo_desafios,"r") as archivo_desafíos:
-            desafios = json.load(archivo_desafíos)
-        desafios_usados = {key: [] for key in desafios.keys()}
-        return desafios, desafios_usados
-    except FileNotFoundError:
-        print("Error: No se encontró el archivo de los desafíos.")
-        return {}, {}
-
-    except json.JSONDecodeError:
-        print("Error: El archivo de desafíos tiene un formato inválido.")
-        return {}, {}
-
-    except Exception as e:
-        print(f"Error inesperado: {e}")
-        return {}, {}
+    desafios = cargar_archivo_json("desafios.json")
+    desafios_usados = {key: [] for key in desafios.keys()}
+    return desafios, desafios_usados
 
 def modificar_puntos(puntos, accion):
     '''
-    Modifica los puntos pasados por parametros segun la accion pasada por parametros, luego devuelve los puntos modificados
+    Modifica los puntos según la acción realizada
     '''
-    if accion == "usar_pista":
-        puntos -= 100
-    elif accion == "completar_desafio":
-        puntos += 500
-    elif accion == "accion_correcta":
-        puntos += 10
-    else:
-        puntos -= 10
-    return puntos
+    modificaciones = {
+        "usar_pista": -COSTO_PISTA,
+        "completar_desafio": PUNTOS_DESAFIO,
+        "accion_correcta": PUNTOS_MOVIMIENTO,
+        "accion_incorrecta": -PUNTOS_MOVIMIENTO
+    }
+    return puntos + modificaciones.get(accion, -PUNTOS_MOVIMIENTO)
 
 def mapa_para_tematica(tematica):
     '''
@@ -432,33 +435,34 @@ def mapa_para_tematica(tematica):
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = generar_mapa(4,5,4,6) 
-        probabilidad_fin = random.randint(40,100) # 83,3 %
+        probabilidad_fin = random.randint(40,100)
         habitaciones_max = 2
     elif(tematica == "Psiquiátrico" or tematica == "La Casa de Papel"):
         mapa = generar_mapa(7,8,5,7)
-        probabilidad_fin = random.randint(-20,100) # 41,6 %
+        probabilidad_fin = random.randint(-20,100)
         habitaciones_max = 3
     elif(tematica == "Sherlock Holmes" or tematica == "Misión Gubernamental"):
         mapa = generar_mapa(9,10,5,8)
-        probabilidad_fin = random.randint(-100,100) # 25 %
+        probabilidad_fin = random.randint(-100,100)
         habitaciones_max = 4
     return mapa, probabilidad_fin, habitaciones_max
 
 def contiene_elementos(lista1, lista2):
     ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
-    #Se recorre en el largo de lista2 (Para poder recorrer toda la segunda lista), se le resta el largo de la primera lista (para poder mirar desde i + el largo de lista1 sin pasarnos del indice)
     for i in range(0,len(lista2) - len(lista1) + 1,2):
         if lista2[i:i+len(lista1)] == lista1: 
-        # Aca se extrae de la lista 2 en indice i, hasta i + el largo de lista1, si esa extraccion es igual a la lista1, entnces la lista 1 esta en la lista dos de forma secuencial
             return True
     return False
 
-def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
+def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
     '''
-    Funcion que provoca que el juego comienze, recibe la tematica por parametro devuelve la cantidad de puntos que consiguio el usuario
+    Funcion que provoca que el juego comienze
     '''
     puntos = 1000 + puntos
     escapo = False
+    timer = Timer()
+    timer.iniciar()
+    
     pistas, pistas_usadas = inicializar_pistas()
     desafios, desafios_usadas = inicializar_desafios()
     mapa, probabilidad_fin, habitaciones_max = mapa_para_tematica(tematica)
@@ -476,11 +480,12 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
     
     while not escapo:
         posicion_actual = get_indice_objeto(mapa,"O")
+        mostrar_tiempo(timer)
+        
         if(len(pistas_usadas.get(tematica)) == 0):
             print("Cuando encuentres una pista aparecera aca")
         else:
             print(pistas_usadas.get(tematica))
-            
         
         if(contiene_elementos(posicion_actual, indices_pistas)): 
             print("----PISTA ENCONTRADA----")
@@ -502,10 +507,10 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
                     print("------ Entrando en la siguiente habitacion.... ------")
                     puntos, escapo = comenzar_juego(tematica,puntos,nro_habitacion+1)
 
-        if (not escapo):        
+        if (not escapo):
             renderizar_mapa(mapa)
             accion = leer_accion()
-            print(vaciar_consola)
+            
             if accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
@@ -516,14 +521,15 @@ def comenzar_juego(tematica,puntos = 0,nro_habitacion = 1):
                 print(f"Puntos actuales: {puntos}")
             else:
                 print("Movimiento inválido: fuera de los límites del mapa.")
-        
+    
+    timer.detener()
     return puntos, escapo
 
 def instrucciones():
     '''
     Muestra las instrucciones para poder jugar al juego
     '''
-    os.system('clear')  # Limpiar la consola
+    os.system('clear')
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
     print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
@@ -532,94 +538,140 @@ def instrucciones():
 
 def registrar_puntos(user, puntos):
     '''
-    Actualiza los puntos de un usuario en el archivo 'user_repository.json' si el nuevo puntaje es mayor al existente.
+    Actualiza los puntos de un usuario si el nuevo puntaje es mayor al existente
     '''
-    try:
-        ruta_archivo_puntos = os.path.join(os.getcwd(), "Data", "user_repository.json")
-        with open(ruta_archivo_puntos, mode="r") as user_repository_archivo:
-            user_repository = json.load(user_repository_archivo)
+    user_repository = cargar_archivo_json("user_repository.json")
+    if not user_repository:
+        print("Error: No se pudo cargar el repositorio de usuarios.")
+        return
 
-        jugador = next((u for u in user_repository if u['Username'] == user), None)
-        if jugador:
-            if puntos > jugador["Puntos"]:
-                jugador["Puntos"] = puntos
-                with open(ruta_archivo_puntos, "w") as user_repository_archivo:
-                    json.dump(user_repository, user_repository_archivo, indent=4)
+    jugador = next((u for u in user_repository if u['username'] == user), None)
+    if jugador:
+        if puntos > jugador["puntos"]:
+            jugador["puntos"] = puntos
+            if guardar_archivo_json("user_repository.json", user_repository):
                 print(f"Puntos actualizados para el usuario '{user}': {puntos}")
             else:
-                print(f"El usuario '{user}' ya tiene un puntaje mayor o igual: {jugador['puntos']}")
+                print("Error al actualizar los puntos.")
         else:
-            print(f"Error: El usuario '{user}' no existe en el repositorio.")
-
-    except FileNotFoundError:
-        print("Error: No se encontró el archivo 'user_repository.json'.")
-    except json.JSONDecodeError:
-        print("Error: El archivo 'user_repository.json' tiene un formato inválido.")
-    except Exception as e:
-        print(f"Error inesperado: {e}")
-
-def primeros_ultimos_anking(usuarios,primeros):
-    usuarios_ordenados = list(sorted(usuarios,key= lambda x: x["Puntos"],reverse=primeros))
-    if(primeros):
-        x=1
+            print(f"El usuario '{user}' ya tiene un puntaje mayor o igual: {jugador['puntos']}")
     else:
-        x=len(usuarios_ordenados)
+        print(f"Error: El usuario '{user}' no existe en el repositorio.")
+
+def ranking_jugador(users, username=None):
+    '''
+    Muestra el ranking de un jugador específico
+    '''
+    if username is None:
+        username = pedir_user_name()
+
+    jugador = next((user for user in users 
+                   if user.get('username', '').lower() == username.lower()), None)
+    
+    if jugador:
+        print(f"\nJugador: {jugador['username']}")
+        print(f"Puntuación máxima: {jugador.get('puntos', 0)}")
+    else:
+        print(f"\nNo se encontró al jugador '{username}'")
+    
+    input("\nPresione Enter para continuar...")
+
+def primeros_ultimos_ranking(usuarios, primeros):
+    '''
+    Muestra los primeros o últimos 10 usuarios del ranking
+    primeros: True para mejores puntuaciones, False para peores
+    '''
+    if not usuarios:
+        print("\nNo hay usuarios registrados en el ranking.")
+        input("\nPresione Enter para continuar...")
+        return
+    
+    usuarios_ordenados = sorted(
+        usuarios,
+        key=lambda x: x.get('puntos', 0),
+        reverse=primeros
+    )
     
     rank = usuarios_ordenados[:10]
     
-    print(f"\tPuesto:\t - \tNombre:\t - \tPuntuacion Máxima:")
-    for users in rank:
-        print(f"\t{x}\t - \t{users['username']}\t - \t{usuarios['puntos']}")
-        if(primeros):
-            x+=1
-        else:
-            x-=1
-
-def ranking_jugador(users,username = None):
-    if(username is None):
-        username = pedir_user_name()
-
-    jugador = list(filter(lambda x: x['Username']==username,users))
-    try:
-        print(f"{jugador[0]['Username']} tiene {jugador[0]['Puntos']} de puntuacion maxima.")
-    except:
-        print("El jugador no existe")
+    print("\n{:<6} {:<15} {:<10}".format("Puesto", "Usuario", "Puntos"))
+    print("-" * 35)
+    
+    for i, user in enumerate(rank, 1):
+        puesto = i if primeros else len(usuarios) - i + 1
+        print("{:<6} {:<15} {:<10}".format(
+            puesto,
+            user.get('username', 'N/A'),
+            user.get('puntos', 0)
+        ))
+    
+    input("\nPresione Enter para continuar...")
 
 def ranking(user):
-    try:
-        ruta_archivo_ranking = os.path.join(os.getcwd(), "Data", "user_repository.json")
-        with open(ruta_archivo_ranking, mode="r") as user_repository_archivo:
-            user_repository = json.load(user_repository_archivo)
-            rank_list = user_repository
-    except (IOError, FileNotFoundError):
-        print("Error al abrir o encontrar el archivo 'user_repository.json'.")
-        return
+    '''
+    Menú principal del ranking
+    '''
+    menu_activo = True
+    while menu_activo:
+        vaciar_consola()
+        print("\n=== RANKING DE JUGADORES ===")
+        print("1. Ver mejores puntuaciones")
+        print("2. Buscar jugador")
+        print("3. Ver peores puntuaciones")
+        print("4. Mi mejor puntuación")
+        print("5. Salir")
+        
+        try:
+            opcion = pedir_opcion(1, 5)
+            
+            user_repository = cargar_archivo_json("user_repository.json")
+            if not isinstance(user_repository, list):
+                user_repository = []
+            
+            if opcion == 1:
+                primeros_ultimos_ranking(user_repository, True)
+            elif opcion == 2:
+                ranking_jugador(user_repository)
+            elif opcion == 3:
+                primeros_ultimos_ranking(user_repository, False)
+            elif opcion == 4:
+                ranking_jugador(user_repository, user)
+            elif opcion == 5:
+                print("\nVolviendo al menú principal...")
+                menu_activo = False
+                
+        except Exception as e:
+            print(f"\nError inesperado: {e}")
+            input("\nPresione Enter para continuar...")
+
+class Timer:
+    def __init__(self):
+        self.segundos = 0
+        self.activo = True
+        self.thread = threading.Thread(target=self._contar)
+        
+    def iniciar(self):
+        """Inicia el timer en un thread separado"""
+        self.activo = True
+        self.thread.start()
     
-    opcion = 0
-    while(opcion != 5):
-        os.system('clear')
-        print()
-        print("1. Ver mejores puntuaciones.")
-        print("2. Buscar jugador.")
-        print("3. Ver peores puntuaciones.")
-        print("4. Mi mejor puntuacion.")
-        print("5. Salir.")
-        opcion = pedir_opcion(1,5)
-        print()
-
-        if(opcion == 1):
-            primeros_ultimos_anking(rank_list,True)
-        elif (opcion == 2):
-            ranking_jugador(rank_list)
-        elif (opcion == 3):
-            primeros_ultimos_anking(rank_list,False)
-        elif (opcion == 4):
-            ranking_jugador(rank_list,user)
-        elif (opcion == 5):
-            print("Saliendo...")
-        else:
-            print("Opcion inexistente.")
-
+    def detener(self):
+        """Detiene el timer"""
+        self.activo = False
+        if self.thread.is_alive():
+            self.thread.join()
+    
+    def _contar(self):
+        """Función que cuenta el tiempo"""
+        while self.activo:
+            time.sleep(1)
+            self.segundos += 1
+    
+    def obtener_tiempo(self):
+        """Devuelve el tiempo en formato mm:ss"""
+        minutos = self.segundos // 60
+        segs = self.segundos % 60
+        return f"{minutos:02d}:{segs:02d}"
 
 def main():
     '''
