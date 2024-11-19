@@ -731,6 +731,9 @@ def instrucciones():
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
     print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
     print("Buena suerte, la vas a necesitar.")
+    print("Para moverse por el mapa, utilizar las flechitas o W,A,S,D")
+    print("Para abandonar la partida, clickear la tecla M")
+    print("Hay un timer de 3 minutos, una vez pasado dicho tiempo, si aun no se finalizo la partida, perdiste.")
 
 def registrar_puntos(user, puntos):
     """
