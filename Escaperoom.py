@@ -18,7 +18,10 @@ PUNTOS_MOVIMIENTO = 10
 
 def vaciar_consola():
     """
-    Limpia la consola de manera compatible con Windows y Unix/Mac
+    Limpia la consola de manera compatible con Windows y Unix/Mac.
+
+    Returns:
+        None
     """
     if os.name == 'nt':
         os.system('cls')
@@ -26,10 +29,15 @@ def vaciar_consola():
         os.system('clear')
 
 def cargar_archivo_json(nombre_archivo):
-    '''
-    Función genérica para cargar archivos JSON
-    Retorna el contenido del archivo o un diccionario vacío si hay error
-    '''
+    """
+    Carga y lee un archivo JSON desde la carpeta Data.
+
+    Args:
+        nombre_archivo (str): Nombre del archivo JSON a cargar
+
+    Returns:
+        dict: Contenido del archivo JSON o diccionario vacío si hay error
+    """
     try:
         ruta_archivo = os.path.join(os.getcwd(), "Data", nombre_archivo)
         with open(ruta_archivo, "r") as archivo:
@@ -45,9 +53,16 @@ def cargar_archivo_json(nombre_archivo):
         return {}
 
 def guardar_archivo_json(nombre_archivo, datos):
-    '''
-    Función genérica para guardar datos en archivos JSON
-    '''
+    """
+    Guarda datos en un archivo JSON en la carpeta Data.
+
+    Args:
+        nombre_archivo (str): Nombre del archivo donde guardar los datos
+        datos (dict): Datos a guardar en formato JSON
+
+    Returns:
+        bool: True si se guardó correctamente, False si hubo error
+    """
     try:
         ruta_archivo = os.path.join(os.getcwd(), "Data", nombre_archivo)
         with open(ruta_archivo, "w") as archivo:
@@ -57,22 +72,39 @@ def guardar_archivo_json(nombre_archivo, datos):
         print(f"Error al guardar {nombre_archivo}: {e}")
         return False
 
-def generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max):
-    '''
-    Genera el terreno de un mapa vacio pasado por parametro, el tipo de terreno sera definido por una variable global
-    el ancho y la altura sera un numero entre los minimos y maximos pasados por parametros.
-    '''
+def generar_terreno(mapa, altura_min, altura_max, ancho_min, ancho_max):
+    """
+    Genera el terreno base del mapa con dimensiones aleatorias dentro de los rangos especificados.
+
+    Args:
+        mapa (list): Lista vacía donde se generará el terreno
+        altura_min (int): Altura mínima del mapa
+        altura_max (int): Altura máxima del mapa
+        ancho_min (int): Ancho mínimo del mapa
+        ancho_max (int): Ancho máximo del mapa
+
+    Returns:
+        None: Modifica el mapa directamente
+    """
     alto_del_mapa = random.randint(altura_min,altura_max)
     ancho_minimo_del_mapa = random.randint(ancho_min,ancho_max) 
 
     for _ in range(alto_del_mapa):
         mapa.append([TERRENO for _ in range(ancho_minimo_del_mapa)])
         
-def generar_objeto(mapa,objeto,cantidad):
-    '''
-    Recibe un mapa (matriz), un objeto (caracter string) cantidad (int) Y genera en x posiciones aleatoria del mapa el objeto pasado por parametro
-    x es definida por cantidad
-    '''
+def generar_objeto(mapa, objeto, cantidad):
+    """
+    Genera objetos en posiciones aleatorias del mapa.
+
+    Args:
+        mapa (list): Matriz que representa el mapa del juego
+        objeto (str): Carácter que representa el objeto a generar
+        cantidad (int): Cantidad de objetos a generar
+
+    Returns:
+        None: Modifica el mapa directamente
+    """
+
     columna_spawn = random.randint(0,len(mapa)-1) 
     fila_spawn = random.randint(0,len(mapa[columna_spawn])-1)
     for _ in range(cantidad):
@@ -82,10 +114,18 @@ def generar_objeto(mapa,objeto,cantidad):
         mapa[columna_spawn][fila_spawn] = objeto
 
 def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
-    '''
-    Genera un mapa de juego con una altura y un ancho, minimo y maximo
-    Ademas de rellenar el mapa con un terreno, un personaje, almenos un candado y almenos una pista.
-    '''
+    """
+    Genera un mapa completo del juego con todos sus elementos.
+
+    Args:
+        altura_min (int): Altura mínima del mapa
+        altura_max (int): Altura máxima del mapa
+        ancho_min (int): Ancho mínimo del mapa
+        ancho_max (int): Ancho máximo del mapa
+
+    Returns:
+        list: Matriz que representa el mapa generado con todos sus elementos
+    """
     mapa = []
     generar_terreno(mapa,altura_min,altura_max,ancho_min,ancho_max)
     for i in [PERSONAJE, CANDADO, PISTA]:
@@ -97,24 +137,38 @@ def generar_mapa(altura_min,altura_max,ancho_min,ancho_max):
     return mapa
 
 def renderizar_mapa(mapa):
-    '''
-    Muestra la salida por consola de una mapa (matriz) recibido por parametro
-    '''
+    """
+    Muestra el mapa en la consola.
+
+    Args:
+        mapa (list): Matriz que representa el mapa a mostrar
+
+    Returns:
+        None
+    """
     for fila in mapa:
         print(fila)
         
 def mostrar_tiempo(timer):
     """
-    Muestra el tiempo transcurrido en la esquina superior
+    Muestra el tiempo transcurrido en el formato mm:ss.
+
+    Args:
+        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+
+    Returns:
+        None
     """
     print(f"Tiempo: {timer.obtener_tiempo()}")
     print()
 
 def leer_accion():
-    '''
-    Lee de la entrada un string ingresado por el usuario, verifica que este dentro de las acciones validas ('w', 'a', 's', 'd','menu')
-    y devuelve la accion validada
-    '''
+    """
+    Lee y valida la entrada del usuario para movimientos y acciones.
+
+    Returns:
+        str: Acción validada ('w', 'a', 's', 'd', 'menu')
+    """
     while True:
         k = readkey()
         if k == key.UP or k.lower() == 'w':
@@ -129,10 +183,18 @@ def leer_accion():
             return 'menu'
 
 def validar_movimiento(mapa, posicion_actual, accion):
-    '''
-    Recibe por parametro un mapa (matriz) una posicion_actual (lista) que hacen referencia a los ejes x y de una matriz, y recibe una accion
-    'w', 'a', 's', 'd' verifica que la matriz desde la posicion_actual tenga espacio para moverse en cada eje segun w a s d
-    '''
+    """
+    Verifica si un movimiento es válido dentro del mapa.
+
+    Args:
+        mapa (list): Matriz que representa el mapa
+        posicion_actual (list): Coordenadas actuales [x, y]
+        accion (str): Dirección del movimiento ('w', 'a', 's', 'd')
+
+    Returns:
+        bool: True si el movimiento es válido, False si no lo es
+    """
+
     filas = len(mapa)
     columnas = len(mapa[0]) if filas > 0 else 0
     
@@ -152,10 +214,16 @@ def validar_movimiento(mapa, posicion_actual, accion):
     return True
 
 def get_indice_objeto(mapa,objeto):
-    '''
-    Recibe por parametro un mapa y un objeto, se encarga de guardar todos los pares [x y] donde ese objeto se encuentre en la matriz y los devuelve
-    en una lista 
-    '''
+    """
+    Encuentra las coordenadas de un objeto específico en el mapa.
+
+    Args:
+        mapa (list): Matriz que representa el mapa
+        objeto (str): Carácter del objeto a buscar
+
+    Returns:
+        list: Lista con las coordenadas [y, x] donde se encuentra el objeto
+    """
     indices = []
     for y in range(len(mapa)):
         for x in range(len(mapa[y])):
@@ -165,18 +233,33 @@ def get_indice_objeto(mapa,objeto):
     return indices
 
 def mover_objeto(mapa,x,y,objeto):
-    '''
-    Mueve a un objeto recibido por parametro dentro de la matriz mapa tambien recibida por parametro, tantas veces en x como diga el parametro
-    y tantas veces en y como diga el parametro.
-    '''
+    """
+    Mueve un objeto en el mapa según las coordenadas especificadas.
+
+    Args:
+        mapa (list): Matriz que representa el mapa
+        x (int): Desplazamiento en el eje x
+        y (int): Desplazamiento en el eje y
+        objeto (str): Carácter del objeto a mover
+
+    Returns:
+        None: Modifica el mapa directamente
+    """
     coordenadas_objeto = get_indice_objeto(mapa,objeto)
     mapa[coordenadas_objeto[0]][coordenadas_objeto[1]] = TERRENO
     mapa[coordenadas_objeto[0]+y*(-1)][coordenadas_objeto[1]+x] = objeto
 
 def accion_personaje(mapa,accion): 
-    '''
-    Recibe un mapa por parametro y una accion, (w,a,s,d) llama a la funcion mover_objeto, para mover al personaje segun la accion elegida
-    '''
+    """
+    Ejecuta el movimiento del personaje según la acción especificada.
+
+    Args:
+        mapa (list): Matriz que representa el mapa
+        accion (str): Dirección del movimiento ('w', 'a', 's', 'd')
+
+    Returns:
+        None: Modifica el mapa directamente
+    """
     if  (accion == "w"):
         mover_objeto(mapa,0,1,PERSONAJE)
     elif(accion == "s"):
@@ -188,9 +271,15 @@ def accion_personaje(mapa,accion):
 
 
 def menu_principal(user):
-    '''
-    Funcion que se encarga de mostrar el menu principal del juego
-    '''
+    """
+    Muestra el menú principal del juego.
+
+    Args:
+        user (str): Nombre del usuario actual
+
+    Returns:
+        None
+    """
     print()
     print(f"{user} Bienvenido a UadEscape")
     print("1. Comenzar Juego")
@@ -200,10 +289,15 @@ def menu_principal(user):
  
 
 def pedir_user_name(jugador_numero=0):
-    '''
-    Funcion que recibe por parametro el numero de jugado que va a jugar , pedir al usuario que ingrese el nombre, y generarlo
-    devuelve el nombre de usuario validado 
-    '''
+    """
+    Solicita y valida el nombre de usuario.
+
+    Args:
+        jugador_numero (int): Número de jugador (0 para un solo jugador)
+
+    Returns:
+        str: Nombre de usuario validado
+    """
     patron = r"^[a-zA-Z]{3,9}$"
     bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido jugador {jugador_numero}") 
     bienvenida(jugador_numero)
@@ -218,15 +312,27 @@ def pedir_user_name(jugador_numero=0):
     return username
 
 def pedir_user_names():
-    '''Funcion auxiliar que  se encarga de pedir y generar dos usernames, para dos jugadores, los devuelve'''
+    """
+    Solicita nombres de usuario para dos jugadores.
+
+    Returns:
+        tuple: Par de nombres de usuario (user_name1, user_name2)
+    """
+
     user_name1 = pedir_user_name(1)
     user_name2 = pedir_user_name(2)
     return user_name1, user_name2
 
 def generar_user(username):
-    '''
-    Genera el registro del usuario nuevo generando una id, y asociándole el nombre de usuario.
-    '''
+    """
+    Genera un nuevo registro de usuario en el repositorio.
+
+    Args:
+        username (str): Nombre de usuario a registrar
+
+    Returns:
+        None
+    """
     user_repository = cargar_archivo_json("user_repository.json")
     if not user_repository:
         user_repository = []
@@ -248,32 +354,51 @@ def generar_user(username):
         print("Error al registrar el usuario.")
 
 def generar_id(user_repository):
-    '''
-    Funcion que genera un id para un usuario, a partir del ultimo id ingresado
-    '''
+    """
+    Genera un nuevo ID para un usuario basado en el último ID registrado.
+
+    Args:
+        user_repository (list): Lista de usuarios registrados
+
+    Returns:
+        int: Nuevo ID generado
+    """
+
     id = 0
     if(len(user_repository) != 0):
         ultimo = len(user_repository)-1 
         id = user_repository[ultimo]['id'] + 1
     return id
 
-def pedir_opcion(min,max):
-    '''
-    Funcion que se encarga de pedir un numero al usuario entre un minimo y un maximo, luego valida y devuelve la opcion elegida
-    '''
-    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    while opcion < min or opcion > max:
-        print("Error, la opción ingresada no es válida.")
-        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    print()
-    return opcion
+def pedir_opcion(min, max):
+    """
+    Solicita y valida una opción numérica dentro de un rango.
+
+    Args:
+        min (int): Valor mínimo aceptado
+        max (int): Valor máximo aceptado
+
+    Returns:
+        int: Opción validada dentro del rango especificado
+    """
+    while True:
+        try:
+            opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+            if min <= opcion <= max:
+                print()
+                return opcion
+            print("Error, la opción ingresada no está en el rango válido.")
+        except ValueError:
+            print("Error, debe ingresar un número.")
 
 def mostrar_dificultades():
-    '''
-    Funcion que se encarga de mostrar los distintos niveles de dificultad
-    '''
+    """
+    Muestra en pantalla los niveles de dificultad disponibles.
+
+    Returns:
+        None
+    """
+
     print("Niveles de dificultad: ")
     print("1. Facil")
     print("2. Normal")
@@ -281,9 +406,12 @@ def mostrar_dificultades():
     
 
 def nivel_de_dificultad():
-    '''
-    Funcion que se encarga de pedirle al usuario que ingrese que dificultad quiere elegir y que devuelve las distintas tematicas segun la dificutald
-    '''
+    """
+    Permite al usuario seleccionar un nivel de dificultad y devuelve las temáticas correspondientes.
+
+    Returns:
+        list: Lista de temáticas disponibles para la dificultad seleccionada
+    """
     mostrar_dificultades()
     opcion = pedir_opcion(1,3)
 
@@ -301,10 +429,12 @@ def nivel_de_dificultad():
     return dificultad
 
 def elegir_tematica():
-    '''
-    Funcion que se encarga de pedirle a un usuario que ingrese que tematica quiere jugar, segun que dificultad anteriormente eligio.
-    Ademas se le mostrara una introduccion a la tematica elegida. Y luego se devuelve la tematica elegida
-    '''
+    """
+    Permite al usuario seleccionar una temática según la dificultad elegida.
+
+    Returns:
+        str: Nombre de la temática seleccionada
+    """
     dificultad = nivel_de_dificultad()
     print("Temáticas disponibles:")
     for i, tematica in enumerate(dificultad, 1):
@@ -315,10 +445,12 @@ def elegir_tematica():
     return dificultad[seleccion - 1]
 
 def cargar_introducciones():
-    '''
-    Carga las introducciones desde el archivo JSON ubicado en la carpeta Data.
-    Si el archivo no existe o contiene un JSON inválido, retorna una lista vacía.
-    '''
+    """
+    Carga las introducciones de las temáticas desde un archivo JSON.
+
+    Returns:
+        dict: Diccionario con las introducciones de cada temática
+    """
     try:
         ruta_archivo_instrucciones = os.path.join(os.getcwd(), "Data", "introducciones.json")
         with open(ruta_archivo_instrucciones, "r") as introducciones_archivo:
@@ -334,13 +466,18 @@ def cargar_introducciones():
         return []
 
 def mostrar_introduccion_a_la_tematica(tematica):   
-    '''
-    Funcion que se encarga de mostrar la introduccion a una tematica
-    '''
+    """
+    Muestra la introducción correspondiente a una temática específica.
+
+    Args:
+        tematica (str): Nombre de la temática a mostrar
+
+    Returns:
+        None
+    """
     introducciones = cargar_introducciones()
     introduccion = introducciones.get(tematica, "Introducción no disponible.")
     print(introduccion)
-
     print("¿Deseas comenzar el juego o salir?")
     print("1. Comenzar Juego")
     print("2. Salir")
@@ -354,17 +491,28 @@ def mostrar_introduccion_a_la_tematica(tematica):
         print("Por favor, ingresá una opción válida.")
 
 def inicializar_pistas():
-    '''
-    Carga las pistas desde un archivo JSON
-    '''
+    """
+    Inicializa el sistema de pistas cargando el archivo JSON correspondiente.
+
+    Returns:
+        tuple: Par de diccionarios (pistas, pistas_usadas)
+    """
     pistas = cargar_archivo_json("pistas.json")
     pistas_usadas = {key: [] for key in pistas.keys()}
     return pistas, pistas_usadas
 
 def mostrar_pistas(tematica, pistas, pistas_usadas):
-    '''
-    Funcion que recibe una tematica, pistas para la misma, y las pistas que fueron usadas, se encarga de mostrar una pista aleatoria de las disopnibles
-    '''
+    """
+    Muestra una pista aleatoria no utilizada para la temática especificada.
+
+    Args:
+        tematica (str): Nombre de la temática
+        pistas (dict): Diccionario con todas las pistas disponibles
+        pistas_usadas (dict): Diccionario con las pistas ya utilizadas
+
+    Returns:
+        None
+    """
     if tematica in pistas:
         disponibles = [pista for pista in pistas[tematica] if pista not in pistas_usadas[tematica]]
         
@@ -378,10 +526,17 @@ def mostrar_pistas(tematica, pistas, pistas_usadas):
         print(f"Temática '{tematica}' no válida.")
 
 def mostrar_desafio(tematica, desafios, desafios_usados):
-    '''
-    Funcion que recibe una tematica, desafios para la misma, y los desafios que fueron usados,
-      se encarga de mostrar un desafio aleatorio de los disponibles
-    '''
+    """
+    Muestra y gestiona un desafío aleatorio no utilizado para la temática especificada.
+
+    Args:
+        tematica (str): Nombre de la temática
+        desafios (dict): Diccionario con todos los desafíos disponibles
+        desafios_usados (dict): Diccionario con los desafíos ya utilizados
+
+    Returns:
+        None
+    """
     fallo = True
     if tematica in desafios:
         disponibles = [desafios for desafios in desafios[tematica] if desafios not in desafios_usados[tematica]]
@@ -409,17 +564,27 @@ def mostrar_desafio(tematica, desafios, desafios_usados):
         print(f"Temática '{tematica}' no válida.")
 
 def inicializar_desafios():
-    '''
-    Carga los desafíos desde un archivo JSON
-    '''
+    """
+    Inicializa el sistema de desafíos cargando el archivo JSON correspondiente.
+
+    Returns:
+        tuple: Par de diccionarios (desafios, desafios_usados)
+    """
     desafios = cargar_archivo_json("desafios.json")
     desafios_usados = {key: [] for key in desafios.keys()}
     return desafios, desafios_usados
 
 def modificar_puntos(puntos, accion):
-    '''
-    Modifica los puntos según la acción realizada
-    '''
+    """
+    Modifica la puntuación según la acción realizada.
+
+    Args:
+        puntos (int): Puntuación actual
+        accion (str): Tipo de acción realizada
+
+    Returns:
+        int: Nueva puntuación después de aplicar la modificación
+    """
     modificaciones = {
         "usar_pista": -COSTO_PISTA,
         "completar_desafio": PUNTOS_DESAFIO,
@@ -429,9 +594,15 @@ def modificar_puntos(puntos, accion):
     return puntos + modificaciones.get(accion, -PUNTOS_MOVIMIENTO)
 
 def mapa_para_tematica(tematica):
-    '''
-    Genera un mapa aleatorio para una tematica recibida por parametro
-    '''
+    """
+    Genera un mapa específico según la temática seleccionada.
+
+    Args:
+        tematica (str): Nombre de la temática
+
+    Returns:
+        tuple: (mapa, probabilidad_fin, habitaciones_max)
+    """
     mapa = []
     if(tematica == "Breaking Bad" or tematica == "Muerte Anunciada"):
         mapa = generar_mapa(4,5,4,6) 
@@ -448,16 +619,47 @@ def mapa_para_tematica(tematica):
     return mapa, probabilidad_fin, habitaciones_max
 
 def contiene_elementos(lista1, lista2):
-    ''' Verifica si lista1 esta en lista2 en forma de secuencia'''
+    """
+    Verifica si una secuencia de elementos está contenida en otra lista.
+
+    Args:
+        lista1 (list): Lista a buscar
+        lista2 (list): Lista donde buscar
+
+    Returns:
+        bool: True si lista1 está contenida en lista2, False en caso contrario
+    """
     for i in range(0,len(lista2) - len(lista1) + 1,2):
         if lista2[i:i+len(lista1)] == lista1: 
             return True
     return False
 
+def verificar_timeout(timer, limite_tiempo=180):
+    """
+    Verifica si se excedió el tiempo límite de 3 minutos
+
+    Args:
+        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+        limite_tiempo (int): Tiempo límite en segundos (default 3 minutos = 180 segundos)
+
+    Returns:
+        bool: True si se excedió el tiempo, False en caso contrario
+    """
+    segundos_transcurridos = timer.obtener_segundos()
+    return segundos_transcurridos >= limite_tiempo
+
 def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
-    '''
-    Funcion que provoca que el juego comienze
-    '''
+    """
+    Inicia y gestiona una partida del juego.
+
+    Args:
+        tematica (str): Temática seleccionada para la partida
+        puntos (int): Puntos iniciales (default: 0)
+        nro_habitacion (int): Número de habitación actual (default: 1)
+
+    Returns:
+        tuple: (puntos_finales, estado_escapo)
+    """
     puntos = 1000 + puntos
     escapo = False
     timer = Timer()
@@ -478,8 +680,9 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             indices_candados = get_indice_objeto(mapa,i)
             cant_candandos = len(indices_candados)//2
     
-    while not escapo:
+    while not escapo and not verificar_timeout(timer):
         posicion_actual = get_indice_objeto(mapa,"O")
+        print("------ Entrando en la siguiente habitacion.... ------")
         mostrar_tiempo(timer)
         
         if(len(pistas_usadas.get(tematica)) == 0):
@@ -506,12 +709,16 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
                 else:
                     print("------ Entrando en la siguiente habitacion.... ------")
                     puntos, escapo = comenzar_juego(tematica,puntos,nro_habitacion+1)
-
+        
         if (not escapo):
             renderizar_mapa(mapa)
             accion = leer_accion()
             
-            if accion == "menu":
+            if puntos <= 0:
+                print("Te quedaste sin puntos. Perdiste LOOOOOSER.")
+                escapo = True
+                puntos = -1
+            elif accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
                 puntos = 0
@@ -522,24 +729,55 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             else:
                 print("Movimiento inválido: fuera de los límites del mapa.")
     
+    if verificar_timeout(timer):
+        print("\n¡TIEMPO AGOTADO! Has perdido.")
+        puntos = -1
+        escapo = True
+    
     timer.detener()
+    mostrar_tiempo_final(timer)
     return puntos, escapo
 
+def mostrar_tiempo_final(timer):
+    """
+    Muestra el tiempo total de juego al finalizar la partida
+
+    Args:
+        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+
+    Returns:
+        None
+    """
+    print(f"\nTiempo total de juego: {timer.obtener_tiempo()}")
+
 def instrucciones():
-    '''
-    Muestra las instrucciones para poder jugar al juego
-    '''
+    """
+    Muestra las instrucciones del juego en pantalla.
+
+    Returns:
+        None
+    """
     os.system('clear')
     print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
     print("Iniciarás con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podés usar pistas, pero estas te costarán puntos.")
     print("Cada acción que realices también te costará puntos, por lo que deberas ser cuidadoso con tus movimientos.")
     print("Si te quedas sin puntos, perderas el juego. Si lográs descifrar el desafío, ganarás puntos. Una vez cumplidos todos los desafíos, en caso de que lo hagas, habrás ganado el juego.")
     print("Buena suerte, la vas a necesitar.")
+    print("Para moverse por el mapa, utilizar las flechitas o W,A,S,D")
+    print("Para abandonar la partida, clickear la tecla M")
+    print("Hay un timer de 3 minutos, una vez pasado dicho tiempo, si aun no se finalizo la partida, perdiste.")
 
 def registrar_puntos(user, puntos):
-    '''
-    Actualiza los puntos de un usuario si el nuevo puntaje es mayor al existente
-    '''
+    """
+    Actualiza el registro de puntos de un usuario si supera su mejor marca.
+
+    Args:
+        user (str): Nombre del usuario
+        puntos (int): Puntos a registrar
+
+    Returns:
+        None
+    """
     user_repository = cargar_archivo_json("user_repository.json")
     if not user_repository:
         print("Error: No se pudo cargar el repositorio de usuarios.")
@@ -559,9 +797,16 @@ def registrar_puntos(user, puntos):
         print(f"Error: El usuario '{user}' no existe en el repositorio.")
 
 def ranking_jugador(users, username=None):
-    '''
-    Muestra el ranking de un jugador específico
-    '''
+    """
+    Muestra la información de ranking de un jugador específico.
+
+    Args:
+        users (list): Lista de usuarios registrados
+        username (str, optional): Nombre del usuario a buscar
+
+    Returns:
+        None
+    """
     if username is None:
         username = pedir_user_name()
 
@@ -577,10 +822,16 @@ def ranking_jugador(users, username=None):
     input("\nPresione Enter para continuar...")
 
 def primeros_ultimos_ranking(usuarios, primeros):
-    '''
-    Muestra los primeros o últimos 10 usuarios del ranking
-    primeros: True para mejores puntuaciones, False para peores
-    '''
+    """
+    Muestra los primeros o últimos 10 usuarios del ranking.
+
+    Args:
+        usuarios (list): Lista de usuarios registrados
+        primeros (bool): True para mostrar mejores puntuaciones, False para peores
+
+    Returns:
+        None
+    """
     if not usuarios:
         print("\nNo hay usuarios registrados en el ranking.")
         input("\nPresione Enter para continuar...")
@@ -608,9 +859,15 @@ def primeros_ultimos_ranking(usuarios, primeros):
     input("\nPresione Enter para continuar...")
 
 def ranking(user):
-    '''
-    Menú principal del ranking
-    '''
+    """
+    Gestiona el menú de ranking y sus opciones.
+
+    Args:
+        user (str): Nombre del usuario actual
+
+    Returns:
+        None
+    """
     menu_activo = True
     while menu_activo:
         vaciar_consola()
@@ -645,6 +902,16 @@ def ranking(user):
             input("\nPresione Enter para continuar...")
 
 class Timer:
+    """
+    Clase para gestionar el tiempo de juego.
+
+    Methods:
+        iniciar(): Inicia el contador de tiempo
+        detener(): Detiene el contador de tiempo
+        _contar(): Método interno para contar segundos
+        obtener_tiempo(): Devuelve el tiempo transcurrido en formato mm:ss
+    """
+
     def __init__(self):
         self.segundos = 0
         self.activo = True
@@ -672,26 +939,42 @@ class Timer:
         minutos = self.segundos // 60
         segs = self.segundos % 60
         return f"{minutos:02d}:{segs:02d}"
+    
+    def obtener_segundos(self):
+        """Devuelve el total de segundos transcurridos"""
+        return self.segundos
 
 def main():
-    '''
-    Programa Principal
-    '''
+    """
+    Función principal que inicia y controla el flujo del juego.
+
+    Returns:
+        None
+    """
     user = pedir_user_name()
     generar_user(user)
     jugando = True
     tematica = 0
+    timer = Timer()
     while(jugando):
         menu_principal(user)
         opcion = pedir_opcion(1,4)
+        
         if(opcion == 1):
             tematica = elegir_tematica()
+            timer.iniciar()
             puntos, escapo = comenzar_juego(tematica)
+            
             if puntos > 0 and escapo:
-                print("Felicidades, escapaste")
                 registrar_puntos(user,puntos)
+            elif puntos == -1:
+                if verificar_timeout(timer):
+                    print("¡TIEMPO AGOTADO! El juego ha terminado.")
+                else:
+                    print("Te quedaste sin puntos. ¡Has perdido!")
             else:
-                print("Abandonaste pero no pasa nada, suerte la proxima!")
+                print("Abandonaste pero no pasa nada, ¡suerte la próxima!")
+            timer.detener()       
         elif (opcion == 2):
             ranking(user)
         elif (opcion == 3):
@@ -699,5 +982,4 @@ def main():
         elif (opcion == 4):
             print("Gracias por Jugar! Saliendo...")
             jugando = False
-    
 main()
