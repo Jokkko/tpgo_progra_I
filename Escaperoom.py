@@ -478,7 +478,6 @@ def mostrar_introduccion_a_la_tematica(tematica):
     introducciones = cargar_introducciones()
     introduccion = introducciones.get(tematica, "Introducción no disponible.")
     print(introduccion)
-
     print("¿Deseas comenzar el juego o salir?")
     print("1. Comenzar Juego")
     print("2. Salir")
@@ -635,6 +634,20 @@ def contiene_elementos(lista1, lista2):
             return True
     return False
 
+def verificar_timeout(timer, limite_tiempo=180):
+    """
+    Verifica si se excedió el tiempo límite de 3 minutos
+
+    Args:
+        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+        limite_tiempo (int): Tiempo límite en segundos (default 3 minutos = 180 segundos)
+
+    Returns:
+        bool: True si se excedió el tiempo, False en caso contrario
+    """
+    segundos_transcurridos = timer.obtener_segundos()
+    return segundos_transcurridos >= limite_tiempo
+
 def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
     """
     Inicia y gestiona una partida del juego.
@@ -667,8 +680,9 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             indices_candados = get_indice_objeto(mapa,i)
             cant_candandos = len(indices_candados)//2
     
-    while not escapo:
+    while not escapo and not verificar_timeout(timer):
         posicion_actual = get_indice_objeto(mapa,"O")
+        print("------ Entrando en la siguiente habitacion.... ------")
         mostrar_tiempo(timer)
         
         if(len(pistas_usadas.get(tematica)) == 0):
@@ -695,7 +709,7 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
                 else:
                     print("------ Entrando en la siguiente habitacion.... ------")
                     puntos, escapo = comenzar_juego(tematica,puntos,nro_habitacion+1)
-
+        
         if (not escapo):
             renderizar_mapa(mapa)
             accion = leer_accion()
@@ -715,8 +729,26 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             else:
                 print("Movimiento inválido: fuera de los límites del mapa.")
     
+    if verificar_timeout(timer):
+        print("\n¡TIEMPO AGOTADO! Has perdido.")
+        puntos = -1
+        escapo = True
+    
     timer.detener()
+    mostrar_tiempo_final(timer)
     return puntos, escapo
+
+def mostrar_tiempo_final(timer):
+    """
+    Muestra el tiempo total de juego al finalizar la partida
+
+    Args:
+        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+
+    Returns:
+        None
+    """
+    print(f"\nTiempo total de juego: {timer.obtener_tiempo()}")
 
 def instrucciones():
     """
@@ -907,6 +939,10 @@ class Timer:
         minutos = self.segundos // 60
         segs = self.segundos % 60
         return f"{minutos:02d}:{segs:02d}"
+    
+    def obtener_segundos(self):
+        """Devuelve el total de segundos transcurridos"""
+        return self.segundos
 
 def main():
     """
@@ -919,19 +955,26 @@ def main():
     generar_user(user)
     jugando = True
     tematica = 0
+    timer = Timer()
     while(jugando):
         menu_principal(user)
         opcion = pedir_opcion(1,4)
+        
         if(opcion == 1):
             tematica = elegir_tematica()
+            timer.iniciar()
             puntos, escapo = comenzar_juego(tematica)
+            
             if puntos > 0 and escapo:
-                print("Felicidades, escapaste")
                 registrar_puntos(user,puntos)
             elif puntos == -1:
-                print("Te quedaste sin puntos. Perdiste LOOOOOSER.")
+                if verificar_timeout(timer):
+                    print("¡TIEMPO AGOTADO! El juego ha terminado.")
+                else:
+                    print("Te quedaste sin puntos. ¡Has perdido!")
             else:
-                print("Abandonaste pero no pasa nada, suerte la proxima!")
+                print("Abandonaste pero no pasa nada, ¡suerte la próxima!")
+            timer.detener()       
         elif (opcion == 2):
             ranking(user)
         elif (opcion == 3):
@@ -939,5 +982,4 @@ def main():
         elif (opcion == 4):
             print("Gracias por Jugar! Saliendo...")
             jugando = False
-    
 main()
