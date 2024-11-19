@@ -21,7 +21,7 @@
         "1|Escucha las grabaciones de audio que dejaron; ¿notas algo extraño? ¿Qué elemento es sospechoso? \n1.Un sonido de fondo que no debería estar ahí.\t\t2.Una palabra clave repetida varias veces.\t\t3.Un cambio brusco en el tono de voz del hablante.",
         "3|En el jardín hay huellas que no deberían estar ahí. ¿Qué harías con las huellas? \n1.Seguirlas hasta el final.\t\t2.Tomar una foto para analizarlas.\t\t3.Buscar un objeto relacionado cerca de las huellas."
     ],
-    "Psiquiátrico": [
+    "Psiquiatrico": [
         "3|Estas dentro de una habitacion con muchas puertas ¿Que haces para no perderte?\n1.Entras siempre en la habitacion de la derecha\t\t2.Haces izquierda derecha en bucle\t\t3.Seguis unas marcas en la pared",
         "1|Encontraste los diarios de los distintos pacientes, ¿Cual agarras?\n1.El del ultimo paciente\t\t2.Uno aleatorio\t\t3.El diario del primer paciente",
         "1|Miras la pared y observas algunas cosas en la pared, ¿Alguna hara algo? \n1.Mover los cuadros\t\t2.Mirar por la ventana\t\t3.Intentar romper la ventana",
@@ -50,7 +50,7 @@
         "2|Una huella en el suelo apunta hacia un lugar inesperado. ¿Cómo la analizarías?\n1.Comparándola con otras huellas encontradas en el lugar.\t\t2.Siguiéndola hasta su destino final.\t\t3.Replicándola para ver si encaja en algún objeto cercano.",
         "1|El violín de Sherlock no es solo un adorno; podría ser una herramienta. ¿Qué deberías hacer con él?\n1.Examinarlo en busca de compartimentos ocultos.\t\t2.Tocar una melodía específica para desbloquear algo.\t\t3.Analizar las cuerdas para encontrar un mensaje cifrado."
     ],
-    "Misión Gubernamental": [
+    "Mision Gubernamental": [
         "3|Te encuentras en la habitacion, y ves un escritorio, te parece un buen comienzo ¿Que haces?\n1.Revisas los cajones \t\t2.Abres las puertas del escritorio \t\t3.Miras por abajo",
         "3|En esta hoja dice que no hay ningun canal seguro, sin embargo algo me dice lo contrario ¿Que canal probamos?\n1.D4NG3R \t\t2.3ST3 N0 \t\t3.S4F3",
         "2|Hay un maletín con un candado numérico, pero el código está encriptado en el mural. ¿Cómo descifrarías el código?\n1.Buscar patrones en las imágenes del mural.\t\t2.Combinar las palabras resaltadas en el mural para formar el código.\t\t3.Buscar símbolos en el mural que coincidan con números.",
