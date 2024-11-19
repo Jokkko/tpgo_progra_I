@@ -370,7 +370,7 @@ def generar_id(user_repository):
         id = user_repository[ultimo]['id'] + 1
     return id
 
-def pedir_opcion(min,max):
+def pedir_opcion(min, max):
     """
     Solicita y valida una opción numérica dentro de un rango.
 
@@ -381,14 +381,15 @@ def pedir_opcion(min,max):
     Returns:
         int: Opción validada dentro del rango especificado
     """
-    opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    while opcion < min or opcion > max:
-        print("Error, la opción ingresada no es válida.")
-        opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
-    
-    print()
-    return opcion
+    while True:
+        try:
+            opcion = int(input(f"Elija una opcion entre {min} y {max}: "))
+            if min <= opcion <= max:
+                print()
+                return opcion
+            print("Error, la opción ingresada no está en el rango válido.")
+        except ValueError:
+            print("Error, debe ingresar un número.")
 
 def mostrar_dificultades():
     """
@@ -699,7 +700,11 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             renderizar_mapa(mapa)
             accion = leer_accion()
             
-            if accion == "menu":
+            if puntos <= 0:
+                print("Te quedaste sin puntos. Perdiste LOOOOOSER.")
+                escapo = True
+                puntos = -1
+            elif accion == "menu":
                 print("Saliendo al menu principal...")
                 escapo = True
                 puntos = 0
@@ -757,7 +762,7 @@ def registrar_puntos(user, puntos):
         print(f"Error: El usuario '{user}' no existe en el repositorio.")
 
 def ranking_jugador(users, username=None):
-       """
+    """
     Muestra la información de ranking de un jugador específico.
 
     Args:
@@ -862,7 +867,7 @@ def ranking(user):
             input("\nPresione Enter para continuar...")
 
 class Timer:
-        """
+    """
     Clase para gestionar el tiempo de juego.
 
     Methods:
@@ -920,6 +925,8 @@ def main():
             if puntos > 0 and escapo:
                 print("Felicidades, escapaste")
                 registrar_puntos(user,puntos)
+            elif puntos == -1:
+                print("Te quedaste sin puntos. Perdiste LOOOOOSER.")
             else:
                 print("Abandonaste pero no pasa nada, suerte la proxima!")
         elif (opcion == 2):
