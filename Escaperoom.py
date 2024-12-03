@@ -962,6 +962,7 @@ def main():
         
         if(opcion == 1):
             tematica = elegir_tematica()
+            timer = Timer()
             timer.iniciar()
             puntos, escapo = comenzar_juego(tematica)
             
@@ -974,6 +975,7 @@ def main():
                     print("Te quedaste sin puntos. ¡Has perdido!")
             else:
                 print("Abandonaste pero no pasa nada, ¡suerte la proxima!")
+                
             timer.detener()       
         elif (opcion == 2):
             ranking(user)
