@@ -5,6 +5,9 @@ import os
 from readchar import readkey, key
 import threading
 import time
+from colorama import Fore, Back, Style, init
+
+init(autoreset=True)
 
 # Constantes
 TERRENO = " "
@@ -43,13 +46,13 @@ def cargar_archivo_json(nombre_archivo):
         with open(ruta_archivo, "r") as archivo:
             return json.load(archivo)
     except FileNotFoundError:
-        print(f"Error: No se encuentra el archivo {nombre_archivo}")
+        print(Fore.RED + f"Error: No se encuentra el archivo {nombre_archivo}")
         return {}
     except json.JSONDecodeError:
-        print(f"Error: El archivo {nombre_archivo} tiene un formato invalido.")
+        print(Fore.RED + f"Error: El archivo {nombre_archivo} tiene un formato invalido.")
         return {}
     except Exception as e:
-        print(f"Error inesperado: {e}")
+        print(Fore.RED + f"Error inesperado: {e}")
         return {}
 
 def guardar_archivo_json(nombre_archivo, datos):
@@ -69,7 +72,7 @@ def guardar_archivo_json(nombre_archivo, datos):
             json.dump(datos, archivo, indent=4)
         return True
     except Exception as e:
-        print(f"Error al guardar {nombre_archivo}: {e}")
+        print(Fore.RED + f"Error al guardar {nombre_archivo}: {e}")
         return False
 
 def generar_terreno(mapa, altura_min, altura_max, ancho_min, ancho_max):
@@ -147,19 +150,21 @@ def renderizar_mapa(mapa):
         None
     """
     for fila in mapa:
-        print(fila)
+        print(Fore.YELLOW + str(fila))
         
 def mostrar_tiempo(timer):
     """
-    Muestra el tiempo transcurrido en el formato mm:ss.
+    Muestra el tiempo transcurrido.
 
     Args:
-        timer (Timer): Objeto Timer que lleva la cuenta del tiempo
+        timer (Timer): El temporizador actual del juego.
 
     Returns:
         None
     """
-    print(f"Tiempo: {timer.obtener_tiempo()}")
+    tiempo = timer.obtener_tiempo()
+    print()
+    print(Fore.BLUE + f"Tiempo transcurrido: {tiempo} segundos")
     print()
 
 def leer_accion():
@@ -269,25 +274,6 @@ def accion_personaje(mapa,accion):
     elif(accion == "d"):
         mover_objeto(mapa,1,0,PERSONAJE)
 
-
-def menu_principal(user):
-    """
-    Muestra el menu principal del juego.
-
-    Args:
-        user (str): Nombre del usuario actual
-
-    Returns:
-        None
-    """
-    print()
-    print(f"{user} Bienvenido a UadEscape")
-    print("1. Comenzar Juego")
-    print("2. Ranking de puntos")
-    print("3. Como Jugar")
-    print("4. Salir")
- 
-
 def pedir_user_name(jugador_numero=0):
     """
     Solicita y valida el nombre de usuario.
@@ -299,30 +285,55 @@ def pedir_user_name(jugador_numero=0):
         str: Nombre de usuario validado
     """
     patron = r"^[a-zA-Z]{3,9}$"
-    bienvenida = lambda x : x if(x == 0) else print(f"Bienvenido jugador {jugador_numero}") 
-    bienvenida(jugador_numero)
-    username = input(f"Jugador, ingrese un nombre de usuario (3-9 caracteres, sin numeros o caracteres especiales): ")
+    username = input(Fore.GREEN + f"Jugador, ingrese un nombre de usuario (3-9 caracteres, sin numeros o caracteres especiales): ")
     nombre_valido = re.match(patron, username)
 
     while nombre_valido is None:
-        if nombre_valido is None:
-            print(f"Nombre no valido. Intentelo de nuevo.")
-        username = input(f"Jugador, por favor, ingrese un nombre de usuario: ")
+        print(Fore.RED + f"Nombre no valido. Intentelo de nuevo.") 
+        username = input(Fore.GREEN + f"Jugador, por favor, ingrese un nombre de usuario: ")
         nombre_valido = re.match(patron, username)
     return username
 
-def pedir_user_names():
+def menu_principal(user):
     """
-    Solicita nombres de usuario para dos jugadores.
+    Muestra el menu principal del juego con estilo y efectos visuales.
+
+    Args:
+        user (str): Nombre del usuario actual
 
     Returns:
-        tuple: Par de nombres de usuario (user_name1, user_name2)
+        None
     """
+    bienvenida = """
+     __    __       ___       _______   _______     _______.  ______     ___      .______    _______ 
+    |  |  |  |     /   \     |       \ |   ____|   /       | /      |   /   \     |   _  \  |   ____|
+    |  |  |  |    /  ^  \    |  .--.  ||  |__     |   (----`|  ,----'  /  ^  \    |  |_)  | |  |__   
+    |  |  |  |   /  /_\  \   |  |  |  ||   __|     \   \    |  |      /  /_\  \   |   ___/  |   __|  
+    |  `--'  |  /  _____  \  |  '--'  ||  |____.----)   |   |  `----./  _____  \  |  |      |  |____ 
+     \______/  /__/     \__\ |_______/ |_______|_______/     \______/__/     \__\ | _|      |_______|
+                                                                                                  
+    """
+    print(Fore.YELLOW + Style.BRIGHT + bienvenida)
+    usuario_formateado = Fore.CYAN + Style.BRIGHT + f"{user.upper()}"
+    print(Fore.GREEN + f"🌟🌟 BIENVENIDO, {usuario_formateado}! 🌟🌟")
+    
+    print(Fore.WHITE + Style.BRIGHT + "=" * 60)
 
-    user_name1 = pedir_user_name(1)
-    user_name2 = pedir_user_name(2)
-    return user_name1, user_name2
+    opciones = [
+        ("1", "Comenzar Juego ▶"), 
+        ("2", "Ranking de Puntos 🔝"),
+        ("3", "Como Jugar 📕"),
+        ("4", "Salir 👋🏻")
+    ]
+    
+    for numero, descripcion in opciones:
+        print(f"{numero}. {descripcion}") 
 
+    print(Fore.WHITE + Style.BRIGHT + "=" * 60)
+    print(Fore.MAGENTA + Style.BRIGHT + "¡Elige tu opcion y empeza la aventura! ✨🚀")
+    print(Fore.LIGHTGREEN_EX + "TE RECOMENDAMOS LEER LAS INSTRUCCIONES ANTES DE ARRANCAR.😉")
+    print() 
+    
 def generar_user(username):
     """
     Genera un nuevo registro de usuario en el repositorio.
@@ -338,7 +349,7 @@ def generar_user(username):
         user_repository = []
 
     while any(user['username'] == username for user in user_repository):
-        print(f"El nombre de usuario '{username}' ya esta en uso. Intente con otro.")
+        print(Fore.RED + f"😳El nombre de usuario '{Fore.CYAN + username + Fore.RED}' ya esta en uso. Intente con otro.")
         username = pedir_user_name()
     
     nuevo_usuario = {
@@ -349,9 +360,9 @@ def generar_user(username):
     user_repository.append(nuevo_usuario)
     
     if guardar_archivo_json("user_repository.json", user_repository):
-        print(f"Usuario '{username}' registrado con exito.")
+        print(Fore.GREEN + f"😎 Usuario '{Fore.CYAN + username + Fore.GREEN}' registrado con exito.")
     else:
-        print("Error al registrar el usuario.")
+        print(Fore.RED + "Error al registrar el usuario.")
 
 def generar_id(user_repository):
     """
@@ -387,60 +398,69 @@ def pedir_opcion(min, max):
             if min <= opcion <= max:
                 print()
                 return opcion
-            print("Error, la opcion ingresada no esta en el rango valido.")
+            else:
+                print(Fore.RED + "Error, la opcion ingresada no esta en el rango valido.")
         except ValueError:
-            print("Error, debe ingresar un numero.")
+            print(Fore.RED + "Error, debe ingresar un numero.")
 
 def mostrar_dificultades():
     """
-    Muestra en pantalla los niveles de dificultad disponibles.
+    Muestra en pantalla los niveles de dificultad disponibles con estilo.
 
     Returns:
         None
     """
-
-    print("Niveles de dificultad: ")
-    print("1. Facil")
-    print("2. Normal")
-    print("3. Dificil")
+    print(Fore.CYAN + Style.BRIGHT + "=== COMENZAR JUEGO ===")
+    print()
+    print(Fore.YELLOW + Style.BRIGHT + "=== SELECCIONA UN NIVEL DE DIFICULTAD ===")
     
+    print("1. 🟢 Facil: Para los que comienzan la aventura!")
+    print("2. 🔵 Normal: ¡Un desafio equilibrado!")
+    print("3. 🔴 Dificil: ¡Solo para los mas valientes!")
+    print()
 
 def nivel_de_dificultad():
     """
-    Permite al usuario seleccionar un nivel de dificultad y devuelve las tematicas correspondientes.
+    Permite al usuario seleccionar un nivel de dificultad y devuelve las tematicas correspondientes con un formato atractivo.
 
     Returns:
         list: Lista de tematicas disponibles para la dificultad seleccionada
     """
     mostrar_dificultades()
-    opcion = pedir_opcion(1,3)
+    opcion = pedir_opcion(1, 3)
 
-    facil = ["Breaking Bad","Muerte Anunciada"]
-    intermedio = ["Psiquiatrico","La Casa de Papel"]
-    dificil = ["Sherlock Holmes","Mision Gubernamental"]
+    facil = ["Breaking Bad", "Muerte Anunciada"]
+    intermedio = ["Psiquiatrico", "La Casa de Papel"]
+    dificil = ["Sherlock Holmes", "Mision Gubernamental"]
 
     if opcion == 1:
         dificultad = facil
+        print(Fore.GREEN + Style.BRIGHT + "Elegiste el nivel facil! 🌱")
     elif opcion == 2:
         dificultad = intermedio
+        print(Fore.BLUE + Style.BRIGHT + "¡Elegiste el nivel normal! 🚀")
     elif opcion == 3:
         dificultad = dificil
-
+        print(Fore.RED + Style.BRIGHT + "¡Elegiste el nivel dificil! 🔥")
     return dificultad
 
 def elegir_tematica():
     """
-    Permite al usuario seleccionar una tematica segun la dificultad elegida.
+    Permite al usuario seleccionar una tematica segun la dificultad elegida con un formato atractivo.
 
     Returns:
         str: Nombre de la tematica seleccionada
     """
     dificultad = nivel_de_dificultad()
-    print("Tematicas disponibles:")
-    for i, tematica in enumerate(dificultad, 1):
-        print(f"{i}: {tematica}")
+    print(Fore.YELLOW + Style.BRIGHT + "\n=== SELECCIONA UNA TEMATICA ===")
 
+    for i, tematica in enumerate(dificultad, 1):
+        print(f"📌{i}. {tematica}")
+    
+    print()
     seleccion = pedir_opcion(1, len(dificultad))
+    print(Fore.GREEN + Style.BRIGHT + f"\nElegiste: {dificultad[seleccion - 1]}")
+    
     mostrar_introduccion_a_la_tematica(dificultad[seleccion - 1])
     return dificultad[seleccion - 1]
 
@@ -458,16 +478,16 @@ def cargar_introducciones():
             return introducciones
         
     except (FileNotFoundError, json.JSONDecodeError):
-        print("No se encontro el archivo o el contenido es invalido.")
+        print(Fore.RED + "No se encontro el archivo o el contenido es invalido.")
         return []
 
     except Exception as e:
-        print(f"Error inesperado: {e}")
+        print(Fore.RED + f"Error inesperado: {e}")
         return []
 
 def mostrar_introduccion_a_la_tematica(tematica):   
     """
-    Muestra la introduccion correspondiente a una tematica especifica.
+    Muestra la introduccion correspondiente a una tematica especifica con estilo.
 
     Args:
         tematica (str): Nombre de la tematica a mostrar
@@ -477,18 +497,29 @@ def mostrar_introduccion_a_la_tematica(tematica):
     """
     introducciones = cargar_introducciones()
     introduccion = introducciones.get(tematica, "Introduccion no disponible.")
-    print(introduccion)
-    print("¿Deseas comenzar el juego o salir?")
-    print("1. Comenzar Juego")
-    print("2. Salir")
+    
+    print(Fore.CYAN + Style.BRIGHT + f"=== Introduccion a la tematica: {tematica} ===")
+    print() 
+    print(Fore.WHITE + "=" * 60)
+    print(Fore.YELLOW + Style.BRIGHT + introduccion)
+    print(Fore.WHITE + "=" * 60)
+    print()
+    print("¿Deseas comenzar el juego o salir? 🌟")
+    print(Fore.GREEN + "1. Comenzar Juego 🚀")
+    print(Fore.RED + "2. Salir ❌")
+    print()
+    
     seleccion = pedir_opcion(1, 2)
     if seleccion == 1:
-        print("Comenzando juego...")
+        print(Fore.GREEN + Style.BRIGHT + "Comenzando juego... 🚀")
+        print()
     elif seleccion == 2:
-        print("Saliendo...")
+        print(Fore.RED + Style.BRIGHT + "Saliendo... ❌")
+        print()
         exit()
     else:
-        print("Por favor, ingresa una opcion valida.")
+        print(Fore.RED + Style.BRIGHT + "⚠️ Por favor, ingresa una opcion valida.")
+        print()
 
 def inicializar_pistas():
     """
@@ -518,12 +549,14 @@ def mostrar_pistas(tematica, pistas, pistas_usadas):
         
         if disponibles:
             pista = random.choice(disponibles)
-            print(f"Pista para {tematica}: {pista}")
+            print()
+            print(Fore.GREEN + f"Pista para {tematica}: {pista}")
+            print()
             pistas_usadas[tematica].append(pista)
         else:
-            print(f"No hay mas pistas disponibles para la tematica '{tematica}'.")
+            print(Fore.YELLOW + f"No hay mas pistas disponibles para la tematica '{tematica}'.")
     else:
-        print(f"Tematica '{tematica}' no valida.")
+        print(Fore.RED + f"Tematica '{tematica}' no valida.")
 
 def mostrar_desafio(tematica, desafios, desafios_usados):
     """
@@ -545,23 +578,22 @@ def mostrar_desafio(tematica, desafios, desafios_usados):
             desafios = random.choice(disponibles) 
             while fallo:
                 desafio = list(desafios.split("|"))
-                print(f"{desafio[1]}")
+                print()
+                print(Fore.YELLOW + ">>>>> DESAFIO <<<<<")
+                print(Fore.GREEN + f"{desafio[1]}")
+                print()
                 opcion = pedir_opcion(1,3)
+                print(Fore.BLACK, Back.BLUE + "Tu respuesta: ", opcion,"👀")
                 if(int(desafio[0])==opcion):
                     fallo = False
-                    print()
-                    print("----- Bien, completaste el desafio -----")
-                    print()
+                    print(Fore.GREEN + "\n----- Bien ahi, completaste el desafio 🤩-----\n")
                 else:
-                    print()
-                    print("----- Dale otra vuelta de tuerca, esa no es. -----")
-                    print()
-
+                    print(Fore.RED + "\n----- Dale otra vuelta de tuerca, esa no es. 😩-----\n")
             desafios_usados[tematica].append(desafios)
         else:
-            print(f"No hay mas desafios disponibles para la tematica '{tematica}'.")
+            print(Fore.YELLOW + f"No hay mas desafios disponibles para la tematica '{tematica}'.")
     else:
-        print(f"Tematica '{tematica}' no valida.")
+        print(Fore.RED + f"Tematica '{tematica}' no valida.")
 
 def inicializar_desafios():
     """
@@ -682,7 +714,7 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
     
     while not escapo and not verificar_timeout(timer):
         posicion_actual = get_indice_objeto(mapa,"O")
-        print("------ Entrando en la siguiente habitacion.... ------")
+        print("------ 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️ Entrando en la siguiente habitacion.... 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️------")
         mostrar_tiempo(timer)
         
         if(len(pistas_usadas.get(tematica)) == 0):
@@ -691,7 +723,9 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             print(pistas_usadas.get(tematica))
         
         if(contiene_elementos(posicion_actual, indices_pistas)): 
-            print("----PISTA ENCONTRADA----")
+            print()
+            print(Fore.BLUE + "----PISTA ENCONTRADA----")
+            print()
             mostrar_pistas(tematica, pistas, pistas_usadas)
             puntos = modificar_puntos(puntos, "usar_pista")
             indices_pistas.remove(posicion_actual[0])
@@ -704,33 +738,47 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             indices_candados.remove(posicion_actual[1])
             if(cant_candandos == 0):
                 if(habitacion_final == True):
-                    print("------ Felicitaciones, lograste escapar.... Por ahora.... ------")
+                    print()
+                    print("------ Felicitaciones 🥳🥳🥳🎉🎊🎊 lograste escapar.... Por ahora.... ------")
+                    print()
                     escapo = True
                 else:
-                    print("------ Entrando en la siguiente habitacion.... ------")
-                    puntos, escapo = comenzar_juego(tematica,puntos,nro_habitacion+1)
+                    print()
+                    print(Fore.BLUE + "------ Entrando en la siguiente habitacion.... ------")
+                    print()
+                    puntos, escapo = comenzar_juego(tematica, puntos, nro_habitacion + 1)
         
         if (not escapo):
             renderizar_mapa(mapa)
             accion = leer_accion()
             
             if puntos <= 0:
-                print("Te quedaste sin puntos. Perdiste LOOOOOSER.")
+                print()
+                print(Fore.RED + Style.BRIGHT + "Te quedaste sin puntos. Perdiste LOOOOOSER.")
+                print()
                 escapo = True
                 puntos = -1
             elif accion == "menu":
-                print("Saliendo al menu principal...")
+                print()
+                print(Fore.YELLOW + "Saliendo al menu principal...")
+                print()
                 escapo = True
                 puntos = 0
-            elif validar_movimiento(mapa, posicion_actual, accion):   
-                accion_personaje(mapa,accion)
-                puntos = modificar_puntos(puntos,accion)
-                print(f"Puntos actuales: {puntos}")
+            elif validar_movimiento(mapa, posicion_actual, accion):
+                accion_personaje(mapa, accion)
+                puntos = modificar_puntos(puntos, accion)
+                print()
+                print(Fore.GREEN + f"Puntos actuales: {puntos}")
+                print()
             else:
-                print("Movimiento invalido: fuera de los limites del mapa.")
+                print()
+                print(Fore.RED + "Movimiento invalido: fuera de los limites del mapa.")
+                print()
     
     if verificar_timeout(timer):
-        print("\n¡TIEMPO AGOTADO! Has perdido.")
+        print()
+        print(Fore.RED + "\n¡TIEMPO AGOTADO! Perdiste :(.")
+        print()
         puntos = -1
         escapo = True
     
@@ -748,7 +796,7 @@ def mostrar_tiempo_final(timer):
     Returns:
         None
     """
-    print(f"\nTiempo total de juego: {timer.obtener_tiempo()}")
+    print(Fore.BLUE, f"\nTiempo total de juego: {timer.obtener_tiempo()}")
 
 def instrucciones():
     """
@@ -758,15 +806,26 @@ def instrucciones():
         None
     """
     os.system('clear')
-    print("Comenzaras tu aventura en un mapa donde podras moverte libremente, tu personaje (Señalizado como una 'O') debera recoger pistas (Señalizadas como '#') para resolver los desafios (Señalizados como '$') y asi escapar!")
-    print("Iniciaras con una totalidad de 1000 puntos a tu favor. Si necesitas ayuda, podes usar pistas, pero estas te costaran puntos.")
-    print("Cada accion que realices tambien te costara puntos, por lo que deberas ser cuidadoso con tus movimientos.")
-    print("Si te quedas sin puntos, perderas el juego. Si logras descifrar el desafio, ganaras puntos. Una vez cumplidos todos los desafios, en caso de que lo hagas, habras ganado el juego.")
-    print("Buena suerte, la vas a necesitar.")
-    print("Para moverse por el mapa, utilizar las flechitas o W,A,S,D")
-    print("Para abandonar la partida, clickear la tecla M")
-    print("Hay un timer de 3 minutos, una vez pasado dicho tiempo, si aun no se finalizo la partida, perdiste.")
+    print()
+    print(Fore.CYAN + "=== 📚 INSTRUCCIONES DEL JUEGO ===")
+    print(Fore.YELLOW + "\nTe encuentras en un mapa donde puedes moverte libremente.")
+    print(Fore.MAGENTA + "Tu objetivo es escapar resolviendo desafios, y para eso tendras que recoger pistas.")
+    print(Fore.GREEN + "\nComenzaras con 1000 puntos. Cada accion que realices costara puntos, ¡cuidado!")
+    print(Fore.RED + "Si te quedas sin puntos, perderas el juego. 💔")
+    print(Fore.BLUE + "\n¡Pero si resuelves los desafios, ganaras puntos! 🎉")
 
+    print(Fore.CYAN + "\nPara moverte usa las teclas: W, A, S, D o las flechitas ⬆️⬇️⬅️➡️")
+    print(Fore.YELLOW + "Y para salir, presiona 'M'. 🚪")
+
+    print(Fore.GREEN + "\n¿Listo para empezar? 🤔 (Si/No)")
+    respuesta = input(Fore.WHITE + "> ").strip().lower()
+    if respuesta == "si" or respuesta == "si":
+        print(Fore.GREEN + "¡Vamos a comenzar! 💥")
+    else:
+        print(Fore.RED + "¡No hay marcha atras! 😈")
+    input("\nPresiona Enter para continuar...")
+    print()
+    
 def registrar_puntos(user, puntos):
     """
     Actualiza el registro de puntos de un usuario si supera su mejor marca.
@@ -780,7 +839,7 @@ def registrar_puntos(user, puntos):
     """
     user_repository = cargar_archivo_json("user_repository.json")
     if not user_repository:
-        print("Error: No se pudo cargar el repositorio de usuarios.")
+        print(Fore.RED + "Error: No se pudo cargar el repositorio de usuarios.")
         return
 
     jugador = next((u for u in user_repository if u['username'] == user), None)
@@ -788,13 +847,14 @@ def registrar_puntos(user, puntos):
         if puntos > jugador["puntos"]:
             jugador["puntos"] = puntos
             if guardar_archivo_json("user_repository.json", user_repository):
-                print(f"Puntos actualizados para el usuario '{user}': {puntos}")
+                print(Fore.GREEN + f"Puntos actualizados para el usuario '{user}': " + Fore.LIGHTCYAN_EX + f"{puntos}")
             else:
-                print("Error al actualizar los puntos.")
+                print(Fore.RED + "Error al actualizar los puntos.")
         else:
-            print(f"El usuario '{user}' ya tiene un puntaje mayor o igual: {jugador['puntos']}")
+            print(Fore.YELLOW + f"El usuario '{user}' ya tiene un puntaje mayor o igual: " + Fore.LIGHTCYAN_EX + f"{jugador['puntos']}")
     else:
-        print(f"Error: El usuario '{user}' no existe en el repositorio.")
+        print(Fore.RED + f"Error: El usuario '{user}' no existe en el repositorio.")
+
 
 def ranking_jugador(users, username=None):
     """
@@ -814,10 +874,10 @@ def ranking_jugador(users, username=None):
                    if user.get('username', '').lower() == username.lower()), None)
     
     if jugador:
-        print(f"\nJugador: {jugador['username']}")
-        print(f"Puntuacion maxima: {jugador.get('puntos', 0)}")
+        print(Fore.GREEN + f"\n🎮 Jugador: {jugador['username']}")
+        print(Fore.CYAN + f"🏆 Puntuacion maxima: {jugador.get('puntos', 0)}")
     else:
-        print(f"\nNo se encontro al jugador '{username}'")
+        print(Fore.RED + f"\n❌ No se encontro al jugador '{username}'")
     
     input("\nPresione Enter para continuar...")
 
@@ -833,8 +893,8 @@ def primeros_ultimos_ranking(usuarios, primeros):
         None
     """
     if not usuarios:
-        print("\nNo hay usuarios registrados en el ranking.")
-        input("\nPresione Enter para continuar...")
+        print(Fore.RED + "\nNo hay usuarios registrados en el ranking. 🚫")
+        input(Fore.WHITE + "\nPresiona Enter para continuar...")
         return
     
     usuarios_ordenados = sorted(
@@ -845,18 +905,23 @@ def primeros_ultimos_ranking(usuarios, primeros):
     
     rank = usuarios_ordenados[:10]
     
-    print("\n{:<6} {:<15} {:<10}".format("Puesto", "Usuario", "Puntos"))
+    print(Fore.CYAN + "\n{:<6} {:<15} {:<10}".format("Puesto", "Usuario", "Puntos"))
     print("-" * 35)
     
     for i, user in enumerate(rank, 1):
         puesto = i if primeros else len(usuarios) - i + 1
+        if i <= 3:
+            puesto_icon = "🥇" if i == 1 else "🥈" if i == 2 else "🥉"
+        else:
+            puesto_icon = "⚫"
+        
         print("{:<6} {:<15} {:<10}".format(
-            puesto,
+            f"{puesto} {puesto_icon}",
             user.get('username', 'N/A'),
             user.get('puntos', 0)
         ))
     
-    input("\nPresione Enter para continuar...")
+    input("\nPresiona Enter para continuar...")
 
 def ranking(user):
     """
@@ -871,12 +936,12 @@ def ranking(user):
     menu_activo = True
     while menu_activo:
         vaciar_consola()
-        print("\n=== RANKING DE JUGADORES ===")
-        print("1. Ver mejores puntuaciones")
-        print("2. Buscar jugador")
-        print("3. Ver peores puntuaciones")
-        print("4. Mi mejor puntuacion")
-        print("5. Salir")
+        print(Fore.LIGHTGREEN_EX + "\n=== 🏆 RANKING DE JUGADORES ===")
+        print(Fore.YELLOW + "1. Ver mejores puntuaciones 🎯")
+        print(Fore.YELLOW + "2. Buscar jugador 🔍")
+        print(Fore.YELLOW + "3. Ver peores puntuaciones 💩")
+        print(Fore.YELLOW + "4. Mi mejor puntuacion 🌟")
+        print(Fore.YELLOW + "5. Salir 🚪")
         
         try:
             opcion = pedir_opcion(1, 5)
@@ -894,11 +959,11 @@ def ranking(user):
             elif opcion == 4:
                 ranking_jugador(user_repository, user)
             elif opcion == 5:
-                print("\nVolviendo al menu principal...")
+                print(Fore.LIGHTCYAN_EX + "\nVolviendo al menu principal... 🚶")
                 menu_activo = False
                 
         except Exception as e:
-            print(f"\nError inesperado: {e}")
+            print(Fore.RED + f"\n❌ Error inesperado: {e}")
             input("\nPresione Enter para continuar...")
 
 class Timer:
@@ -962,6 +1027,7 @@ def main():
         
         if(opcion == 1):
             tematica = elegir_tematica()
+            timer = Timer()
             timer.iniciar()
             puntos, escapo = comenzar_juego(tematica)
             
@@ -969,17 +1035,18 @@ def main():
                 registrar_puntos(user,puntos)
             elif puntos == -1:
                 if verificar_timeout(timer):
-                    print("¡TIEMPO AGOTADO! El juego ha terminado.")
+                    print(Fore.RED + "¡TIEMPO AGOTADO! El juego ha terminado. ⏰")
                 else:
-                    print("Te quedaste sin puntos. ¡Has perdido!")
+                    print(Fore.RED + "Te quedaste sin puntos. ¡Has perdido! 💔")
             else:
-                print("Abandonaste pero no pasa nada, ¡suerte la proxima!")
+                print(Fore.YELLOW + "Abandonaste pero no pasa nada, ¡suerte la proxima! 🍀")
+                
             timer.detener()       
         elif (opcion == 2):
             ranking(user)
         elif (opcion == 3):
             instrucciones()
         elif (opcion == 4):
-            print("Gracias por Jugar! Saliendo...")
+            print(Fore.LIGHTMAGENTA_EX + "\nGracias por jugar! Saliendo... 👋")
             jugando = False
 main()
