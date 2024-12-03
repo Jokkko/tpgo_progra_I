@@ -713,8 +713,7 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
             cant_candandos = len(indices_candados)//2
     
     while not escapo and not verificar_timeout(timer):
-        posicion_actual = get_indice_objeto(mapa,"O")
-        print("------ 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️ Entrando en la siguiente habitacion.... 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️------")
+        posicion_actual = get_indice_objeto(mapa,"O") 
         mostrar_tiempo(timer)
         
         if(len(pistas_usadas.get(tematica)) == 0):
@@ -744,7 +743,7 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
                     escapo = True
                 else:
                     print()
-                    print(Fore.BLUE + "------ Entrando en la siguiente habitacion.... ------")
+                    print(Fore.BLUE + "------ 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️ Entrando en la siguiente habitacion.... 🏃🏃‍♀️🏃‍♀️‍➡️🏃‍➡️------")
                     print()
                     puntos, escapo = comenzar_juego(tematica, puntos, nro_habitacion + 1)
         
@@ -783,10 +782,10 @@ def comenzar_juego(tematica, puntos=0, nro_habitacion=1):
         escapo = True
     
     timer.detener()
-    mostrar_tiempo_final(timer)
+    mostrar_tiempo_final(timer,nro_habitacion)
     return puntos, escapo
 
-def mostrar_tiempo_final(timer):
+def mostrar_tiempo_final(timer,nro_habitacion):
     """
     Muestra el tiempo total de juego al finalizar la partida
 
@@ -796,7 +795,7 @@ def mostrar_tiempo_final(timer):
     Returns:
         None
     """
-    print(Fore.BLUE, f"\nTiempo total de juego: {timer.obtener_tiempo()}")
+    print(Fore.BLUE, f"\nTiempo total de juego en la habitacion {nro_habitacion}: {timer.obtener_tiempo()}")
 
 def instrucciones():
     """
